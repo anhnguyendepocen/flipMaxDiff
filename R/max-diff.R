@@ -62,7 +62,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     if (algorithm == "HB")
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
-                                           hb.adapt.delta, TRUE)
+                                           hb.adapt.delta, TRUE, seed)
     }
     else if (is.null(characteristics))
     {
