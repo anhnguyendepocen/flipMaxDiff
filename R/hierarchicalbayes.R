@@ -17,7 +17,6 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
     X <- array(dim = c(n.respondents, n.questions.left.in, n.choices, n.alternatives))
     Y.best <- array(1, dim = c(n.respondents, n.questions.left.in))
     Y.worst <- array(n.choices, dim = c(n.respondents, n.questions.left.in))
-    Z <- array(1, dim = c(1, n.respondents))
 
     for (n in 1:n.respondents)
     {
@@ -33,11 +32,9 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
                      K = n.alternatives,
                      R = n.respondents,
                      S = n.questions.left.in,
-                     G = 1,
                      YB = Y.best,
                      YW = Y.worst,
-                     X = X,
-                     Z = Z)
+                     X = X)
 
     if (.Platform$OS.type == "unix")
     {
@@ -57,13 +54,13 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
     }
     else # windows
     {
-        rstan_options(auto_write=TRUE) # writes a compiled Stan program to the disk to avoid recompiling
+        rstan_options(auto_write = TRUE) # writes a compiled Stan program to the disk to avoid recompiling
         stan.fit <- stan(file = "exec/hb.stan", data = stan.dat, iter = n.iterations,
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
 
-    resp.pars <- t(colMeans(extract(stan.fit, pars=c("Beta"))$Beta, dims = 1))
+    resp.pars <- colMeans(extract(stan.fit, pars=c("Beta"))$Beta, dims = 1)
     colnames(resp.pars) <- dat$alternative.names
 
     result <- list(respondent.parameters = resp.pars, stan.fit = stan.fit)
