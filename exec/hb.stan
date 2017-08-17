@@ -12,17 +12,24 @@ parameters {
   vector[K] Beta[R];
   vector[K - 1] Theta_raw;
   cholesky_factor_corr[K] L_Omega;
-  vector<lower=0>[K] L_sigma;
+  vector<lower=0, upper=pi()/2>[K] L_sigma_unif;
 }
 
 transformed parameters {
-  matrix[K, K] L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
+  vector<lower=0>[K] L_sigma;
+  matrix[K, K] L_Sigma;
   vector[C] XB[R, S];
   vector[K] Theta;
 
+  for (k in 1:K) {
+    L_sigma[k] = 2.5 * tan(L_sigma_unif[k]);
+  }
+
+  L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
+
   Theta[1] = 0;
   for (k in 1:(K-1)) {
-      Theta[k + 1] = Theta_raw[k];
+    Theta[k + 1] = Theta_raw[k];
   }
 
   for (r in 1:R) {
@@ -36,7 +43,6 @@ model {
   //priors
   Theta_raw ~ normal(0, 10);
   L_Omega ~ lkj_corr_cholesky(4);
-  L_sigma ~ cauchy(0, 2.5);
 
   //likelihood
   Beta ~ multi_normal_cholesky(Theta, L_Sigma);
