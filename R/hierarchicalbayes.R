@@ -46,6 +46,20 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
         # Ideally we would want to recompile when the package is built (similar to Rcpp)
         stan.fit <- sampling(mod, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
                              control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
+    }
+    else # windows
+    {
+        rstan_options(auto_write = TRUE) # writes a compiled Stan program to the disk to avoid recompiling
+        stan.fit <- stan(file = "exec/hb.stan", data = stan.dat, iter = n.iterations,
+                         chains = n.chains, seed = seed,
+                         control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
+    }
+
+    resp.pars <- colMeans(extract(stan.fit, pars=c("Beta"))$Beta, dims = 1)
+    colnames(resp.pars) <- dat$alternative.names
+
+    if (.Platform$OS.type == "unix")
+    {
         # Replace stanmodel with a dummy as stanmodel makes the output many times larger,
         # and is not required for diagnostic plots.
         dummy.stanmodel <- ""
@@ -59,16 +73,6 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
             for (nm in nms)
                 stan.fit@sim$samples[[i]][[nm]] <- 0
     }
-    else # windows
-    {
-        rstan_options(auto_write = TRUE) # writes a compiled Stan program to the disk to avoid recompiling
-        stan.fit <- stan(file = "exec/hb.stan", data = stan.dat, iter = n.iterations,
-                         chains = n.chains, seed = seed,
-                         control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
-    }
-
-    resp.pars <- colMeans(extract(stan.fit, pars=c("Beta"))$Beta, dims = 1)
-    colnames(resp.pars) <- dat$alternative.names
 
     result <- list(respondent.parameters = resp.pars, stan.fit = stan.fit)
     class(result) <- "FitMaxDiff"
