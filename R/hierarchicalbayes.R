@@ -51,6 +51,12 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
         dummy.stanmodel <- ""
         class(dummy.stanmodel) <- "stanmodel"
         stan.fit@stanmodel <- dummy.stanmodel
+
+        # Set the XB samples to zero to save space
+        nms <- names(stan.fit@sim$samples[[1]])
+        nms <- nms[grepl("XB", nms)]
+        for (nm in nms)
+            stan.fit@sim$samples[[1]][[nm]] <- 0
     }
     else # windows
     {
