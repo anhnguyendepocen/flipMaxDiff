@@ -68,7 +68,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
 
         # Set samples to zero to save space
         nms <- names(stan.fit@sim$samples[[1]])
-        nms <- nms[grepl("XB", nms) | grepl("Beta", nms)]
+        nms <- nms[grepl("XB", nms) | grepl("Beta", nms) | grepl("standard_normal", nms)]
         for (i in 1:stan.fit@sim$chains)
             for (nm in nms)
                 stan.fit@sim$samples[[i]][[nm]] <- 0
