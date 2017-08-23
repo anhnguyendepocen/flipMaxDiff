@@ -68,10 +68,16 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
 
         # Set samples to zero to save space
         nms <- names(stan.fit@sim$samples[[1]])
-        nms <- nms[grepl("XB", nms) | grepl("Beta", nms)]
+        nms <- nms[grepl("XB", nms) | grepl("Beta", nms) | grepl("standard_normal", nms) |
+                   grepl("Theta_raw", nms) | grepl("L_sigma_unif", nms) | grepl("L_Omega", nms)]
         for (i in 1:stan.fit@sim$chains)
+        {
             for (nm in nms)
                 stan.fit@sim$samples[[i]][[nm]] <- 0
+            attr(stan.fit@sim$samples[[i]], "inits") <- NULL
+            attr(stan.fit@sim$samples[[i]], "mean_pars") <- NULL
+        }
+        stan.fit@inits <- list()
     }
 
     result <- list(respondent.parameters = resp.pars, stan.fit = stan.fit)
