@@ -16,14 +16,12 @@ parameters {
 }
 
 transformed parameters {
-    vector<lower=0>[K] L_sigma;
     matrix[K, K] L_Sigma;
     vector[C] XB[R, S];
     vector[K] Theta;
     vector[K] Beta[R];
 
-    L_sigma = 2.5 * tan(L_sigma_unif);
-    L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
+    L_Sigma = diag_pre_multiply(2.5 * tan(L_sigma_unif), L_Omega);
 
     Theta[1] = -sum(Theta_raw);
     for (k in 1:(K - 1))
