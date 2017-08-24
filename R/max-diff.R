@@ -41,7 +41,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        output = "Probabilities", tasks.left.out = 0, is.mixture.of.normals = FALSE,
                        algorithm = "Default", normal.covariance = "Full", pool.variance = FALSE,
                        lc.tolerance = 0.0001, n.draws = 100, is.tricked = FALSE,
-                       hb.iterations = 100, hb.chains = 1, hb.max.tree.depth = 10,
+                       hb.iterations = 500, hb.chains = 2, hb.max.tree.depth = 10,
                        hb.adapt.delta = 0.8)
 {
     if (!is.null(weights) && !is.null(characteristics))
