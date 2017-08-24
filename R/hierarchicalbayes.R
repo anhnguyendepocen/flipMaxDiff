@@ -55,7 +55,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
 
-    resp.pars <- colMeans(extract(stan.fit, pars=c("Beta"))$Beta, dims = 1)
+    resp.pars <- colMeans(extract(stan.fit, pars=c("beta"))$beta, dims = 1)
     colnames(resp.pars) <- dat$alternative.names
 
     if (.Platform$OS.type == "unix")
@@ -68,8 +68,9 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 100, n.chains = 1, max.
 
         # Set samples to zero to save space
         nms <- names(stan.fit@sim$samples[[1]])
-        nms <- nms[grepl("XB", nms) | grepl("Beta", nms) | grepl("standard_normal", nms) |
-                   grepl("Theta_raw", nms) | grepl("L_sigma_unif", nms) | grepl("L_Omega", nms)]
+        nms <- nms[grepl("XB", nms) | grepl("beta", nms) | grepl("standard_normal", nms) |
+                   grepl("theta_raw", nms) | grepl("sigma_unif", nms) | grepl("L_omega", nms) |
+                   grepl("L_sigma", nms)]
         for (i in 1:stan.fit@sim$chains)
         {
             for (nm in nms)

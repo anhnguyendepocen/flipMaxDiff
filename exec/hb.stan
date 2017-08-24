@@ -9,38 +9,38 @@ data {
 }
 
 parameters {
-    vector[K - 1] Theta_raw;
-    cholesky_factor_corr[K] L_Omega;
-    vector<lower=0, upper=pi()/2>[K] L_sigma_unif;
+    vector[K - 1] theta_raw;
+    cholesky_factor_corr[K] L_omega;
+    vector<lower=0, upper=pi()/2>[K] sigma_unif;
     vector[K] standard_normal[R];
 }
 
 transformed parameters {
-    vector<lower=0>[K] L_sigma;
-    matrix[K, K] L_Sigma;
+    vector<lower=0>[K] sigma;
+    matrix[K, K] L_sigma;
     vector[C] XB[R, S];
-    vector[K] Theta;
-    vector[K] Beta[R];
+    vector[K] theta;
+    vector[K] beta[R];
 
-    L_sigma = 2.5 * tan(L_sigma_unif);
-    L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
+    sigma = 2.5 * tan(sigma_unif);
+    L_sigma = diag_pre_multiply(sigma, L_omega);
 
-    Theta[1] = -sum(Theta_raw);
+    theta[1] = -sum(theta_raw);
     for (k in 1:(K - 1))
-        Theta[k + 1] = Theta_raw[k];
+        theta[k + 1] = theta_raw[k];
 
     for (r in 1:R)
     {
-        Beta[r] = Theta + L_Sigma * standard_normal[r];
+        beta[r] = theta + L_sigma * standard_normal[r];
         for (s in 1:S)
-            XB[r,s] = X[r,s] * Beta[r];
+            XB[r,s] = X[r,s] * beta[r];
     }
 }
 
 model {
     //priors
-    Theta_raw ~ normal(0, 10);
-    L_Omega ~ lkj_corr_cholesky(4);
+    theta_raw ~ normal(0, 10);
+    L_omega ~ lkj_corr_cholesky(4);
 
     for (r in 1:R)
         standard_normal[r] ~ normal(0, 1);
