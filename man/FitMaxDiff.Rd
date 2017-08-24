@@ -12,7 +12,7 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   algorithm = "Default", normal.covariance = "Full",
   pool.variance = FALSE, lc.tolerance = 1e-04, n.draws = 100,
   is.tricked = FALSE, hb.iterations = 500, hb.chains = 2,
-  hb.max.tree.depth = 10, hb.adapt.delta = 0.8)
+  hb.max.tree.depth = 10, hb.adapt.delta = 0.8, hb.keep.samples = FALSE)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
@@ -75,6 +75,8 @@ Can be 'Full, 'Spherical', 'Diagonal'.}
 \item{hb.max.tree.depth}{http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded}
 
 \item{hb.adapt.delta}{http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup}
+
+\item{hb.keep.samples}{Whether to keep the samples of all the parameters in the output.}
 }
 \description{
 Fits a latent class rank-ordered logit model with ties to a max-diff experiment.

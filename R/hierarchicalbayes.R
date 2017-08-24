@@ -1,6 +1,7 @@
 #' @importFrom rstan rstan_options stan extract sampling
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 2, max.tree.depth = 10,
-                                     adapt.delta = 0.8, is.tricked = FALSE, seed = 123)
+                                     adapt.delta = 0.8, is.tricked = FALSE, seed = 123,
+                                     keep.samples = FALSE)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
@@ -58,7 +59,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 2, max.
     resp.pars <- colMeans(extract(stan.fit, pars=c("beta"))$beta, dims = 1)
     colnames(resp.pars) <- dat$alternative.names
 
-    if (.Platform$OS.type == "unix")
+    if (!keep.samples)
     {
         # Replace stanmodel with a dummy as stanmodel makes the output many times larger,
         # and is not required for diagnostic plots.

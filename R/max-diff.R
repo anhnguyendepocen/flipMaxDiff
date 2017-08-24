@@ -34,6 +34,7 @@
 #' @param hb.chains The number of chains in Hierarchical Bayes.
 #' @param hb.max.tree.depth http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
 #' @param hb.adapt.delta http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+#' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
@@ -42,7 +43,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        algorithm = "Default", normal.covariance = "Full", pool.variance = FALSE,
                        lc.tolerance = 0.0001, n.draws = 100, is.tricked = FALSE,
                        hb.iterations = 500, hb.chains = 2, hb.max.tree.depth = 10,
-                       hb.adapt.delta = 0.8)
+                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE)
 {
     if (!is.null(weights) && !is.null(characteristics))
         stop("Weights are not able to be applied when characteristics are supplied.")
@@ -62,7 +63,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     if (algorithm == "HB")
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
-                                           hb.adapt.delta, TRUE, seed)
+                                           hb.adapt.delta, TRUE, seed, hb.keep.samples)
     }
     else if (is.null(characteristics))
     {
