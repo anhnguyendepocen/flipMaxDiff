@@ -59,30 +59,34 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 2, max.
     resp.pars <- colMeans(extract(stan.fit, pars=c("beta"))$beta, dims = 1)
     colnames(resp.pars) <- dat$alternative.names
 
-    if (!keep.samples)
-    {
-        # Replace stanmodel with a dummy as stanmodel makes the output many times larger,
-        # and is not required for diagnostic plots.
-        dummy.stanmodel <- ""
-        class(dummy.stanmodel) <- "stanmodel"
-        stan.fit@stanmodel <- dummy.stanmodel
-
-        # Set samples to zero to save space
-        nms <- names(stan.fit@sim$samples[[1]])
-        nms <- nms[grepl("XB", nms) | grepl("beta", nms) | grepl("standard_normal", nms) |
-                   grepl("theta_raw", nms) | grepl("sigma_unif", nms) | grepl("L_omega", nms) |
-                   grepl("L_sigma", nms)]
-        for (i in 1:stan.fit@sim$chains)
-        {
-            for (nm in nms)
-                stan.fit@sim$samples[[i]][[nm]] <- 0
-            attr(stan.fit@sim$samples[[i]], "inits") <- NULL
-            attr(stan.fit@sim$samples[[i]], "mean_pars") <- NULL
-        }
-        stan.fit@inits <- list()
-    }
-
-    result <- list(respondent.parameters = resp.pars, stan.fit = stan.fit)
+    result <- list(respondent.parameters = resp.pars)
+    result$stan.fit <- if (keep.samples) stan.fit else reduceStanFitSize(stan.fit)
     class(result) <- "FitMaxDiff"
     result
+}
+
+# This function reduces the size of the stan.fit object to reduce the time
+# it takes to return it from the R server.
+reduceStanFitSize <- function(stan.fit)
+{
+    # Replace stanmodel with a dummy as stanmodel makes the output many times larger,
+    # and is not required for diagnostic plots.
+    dummy.stanmodel <- ""
+    class(dummy.stanmodel) <- "stanmodel"
+    stan.fit@stanmodel <- dummy.stanmodel
+
+    # Set samples to zero to save space
+    nms <- names(stan.fit@sim$samples[[1]])
+    nms <- nms[grepl("XB", nms) | grepl("beta", nms) | grepl("standard_normal", nms) |
+                   grepl("theta_raw", nms) | grepl("sigma_unif", nms) | grepl("L_omega", nms) |
+                   grepl("L_sigma", nms)]
+    for (i in 1:stan.fit@sim$chains)
+    {
+        for (nm in nms)
+            stan.fit@sim$samples[[i]][[nm]] <- 0
+        attr(stan.fit@sim$samples[[i]], "inits") <- NULL
+        attr(stan.fit@sim$samples[[i]], "mean_pars") <- NULL
+    }
+    stan.fit@inits <- list()
+    stan.fit
 }

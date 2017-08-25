@@ -12,7 +12,31 @@ context("Hierarchical Bayes")
 #
 # test_that("HB", {
 #     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-#                          alternative.names = names, algorithm = "HB")
+#                          alternative.names = names, algorithm = "HB", hb.iterations = 200, hb.chains = 2,
+#                          hb.sample.summary = TRUE)
 #     expect_error(print(result), NA)
 # })
+#
+# test_that("HB cross validation", {
+#     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
+#                          alternative.names = names, algorithm = "HB", hb.iterations = 200, hb.chains = 2,
+#                          tasks.left.out = 2)
+#     expect_error(print(result), NA)
+# })
+#
+# test_that("HB filter", {
+#     sub <- unclass(tech.data$Q2) <= 3
+#     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
+#                          alternative.names = names, algorithm = "HB", hb.iterations = 200, hb.chains = 2,
+#                          subset = sub)
+#     expect_error(print(result), NA)
+# })
+#
+# test_that("HB weights", {
+#     wgt <- tech.data$RESPNUM
+#     expect_error(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
+#                          alternative.names = names, algorithm = "HB", hb.iterations = 200, hb.chains = 2,
+#                          weights = wgt), "Weights are not able to be applied for Hierarchical Bayes.")
+# })
+
 
