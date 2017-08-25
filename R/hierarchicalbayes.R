@@ -58,7 +58,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 2, max.
 
     resp.pars <- colMeans(extract(stan.fit, pars=c("beta"))$beta, dims = 1)
     colnames(resp.pars) <- dat$alternative.names
-    m <- monitor(extract(stan.fit, permuted = FALSE, inc_warmup = TRUE), probs = c())
+    m <- suppressWarnings(monitor(extract(stan.fit, permuted = FALSE, inc_warmup = TRUE), probs = c()))
 
     if (!keep.samples)
     {
