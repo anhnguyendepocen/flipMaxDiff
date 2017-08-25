@@ -7,5 +7,5 @@ MaxDiff Experimental Design and Analysis
 To install from GitHub
 ```
 require(devtools)
-install_github("Displayr/MaxDiff")
+install_github("Displayr/flipMaxDiff")
 ```
