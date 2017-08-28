@@ -9,3 +9,5 @@ To install from GitHub
 require(devtools)
 install_github("Displayr/flipMaxDiff")
 ```
+
+[![Displayr logo](https://mwmclean.github.io/img/logo-header.png)](https://www.displayr.com)
