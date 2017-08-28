@@ -11,7 +11,7 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   tasks.left.out = 0, is.mixture.of.normals = FALSE,
   algorithm = "Default", normal.covariance = "Full",
   pool.variance = FALSE, lc.tolerance = 1e-04, n.draws = 100,
-  is.tricked = FALSE, hb.iterations = 500, hb.chains = 2,
+  is.tricked = FALSE, hb.iterations = 500, hb.chains = 8,
   hb.max.tree.depth = 10, hb.adapt.delta = 0.8, hb.keep.samples = FALSE)
 }
 \arguments{

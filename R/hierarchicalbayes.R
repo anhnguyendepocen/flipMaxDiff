@@ -1,5 +1,5 @@
 #' @importFrom rstan rstan_options stan extract sampling
-hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 2, max.tree.depth = 10,
+hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = FALSE, seed = 123,
                                      keep.samples = FALSE)
 {
