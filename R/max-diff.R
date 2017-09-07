@@ -22,7 +22,8 @@
 #' @param lc Whether to run latent class step at the end if characteristics are supplied.
 #' @param output Output type. Can be "Probabilities" or "Classes".
 #' @param tasks.left.out Number of questions to leave out for cross-validation.
-#' @param algorithm If "HB", Hierarchical Bayes with a MVN prior is used and the other parameters are ignored.
+#' @param algorithm If "HB" or "HB-Gibbs", Hierarchical Bayes with a MVN prior is used and the other
+#'  parameters are ignored.
 #' @param is.mixture.of.normals Whether to model with mixture of normals instead of LCA.
 #' @param normal.covariance The form of the covariance matrix for mixture of normals.
 #' Can be 'Full, 'Spherical', 'Diagonal'.
@@ -47,7 +48,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
 {
     if (!is.null(weights) && !is.null(characteristics))
         stop("Weights are not able to be applied when characteristics are supplied.")
-    if (!is.null(weights) && algorithm == "HB")
+    if (!is.null(weights) && (algorithm == "HB" || algorithm == "HB-Gibbs"))
         stop("Weights are not able to be applied for Hierarchical Bayes.")
     if (!lc && is.null(characteristics))
         stop("There is no model to run. Select covariates and/or run latent class analysis over respondents.")
@@ -64,6 +65,10 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
                                            hb.adapt.delta, TRUE, seed, hb.keep.samples)
+    }
+    else if (algorithm == "HB-Gibbs")
+    {
+        result <- hierarchicalBayesGibbsMaxDiff(dat, hb.iterations, seed)
     }
     else if (is.null(characteristics))
     {
@@ -187,8 +192,11 @@ print.FitMaxDiff <- function(x, ...)
         "MaxDiff: Mixture of Normals"
     else if (x$algorithm == "HB")
         "MaxDiff: Hierarchical Bayes"
+    else if (x$algorithm == "HB-Gibbs")
+        "MaxDiff: Hierarchical Bayes (Gibbs sampling)"
     else
         "MaxDiff: Latent Class Analysis"
+    is.hb <- x$algorithm %in% c("HB", "HB-Gibbs")
     footer <- paste0("n = ", x$n.respondents, "; ")
     if (!is.null(x$subset) && !all(x$subset))
         footer <- paste0(footer, "Filters have been applied; ")
@@ -202,13 +210,13 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "Questions left out: ", x$questions.left.out, "; ")
     }
     footer <- paste0(footer, "Alternatives per question: ", x$n.alternatives.per.task, "; ")
-    if (x$algorithm != "HB")
+    if (!is.hb)
     {
         footer <- paste0(footer, "Log-likelihood: ", FormatAsReal(x$log.likelihood, decimals = 2), "; ")
         footer <- paste0(footer, "BIC: ", FormatAsReal(x$bic, decimals = 2), "; ")
     }
 
-    footer <- if (!x$lc && x$algorithm != "HB" && !x$is.mixture.of.normals)
+    footer <- if (!x$lc && !is.hb && !x$is.mixture.of.normals)
         paste0(footer, "Latent class analysis over respondents not applied; ")
     else if (x$is.mixture.of.normals)
     {
@@ -217,7 +225,7 @@ print.FitMaxDiff <- function(x, ...)
         else
             paste0(footer, "Mixture of normals: ", x$n.classes, " classes; ")
     }
-    else if (x$algorithm == "HB")
+    else if (is.hb)
         footer
     else
     {
@@ -234,7 +242,7 @@ print.FitMaxDiff <- function(x, ...)
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
     if (x$n.classes == 1 && is.null(x$covariates.notes)
-        && ((!x$is.mixture.of.normals && x$algorithm != "HB") || x$output == "Classes"))
+        && ((!x$is.mixture.of.normals && !is.hb) || x$output == "Classes"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)

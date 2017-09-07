@@ -55,7 +55,8 @@ no outputs, and 6 is the most detailed outputs.}
 
 \item{is.mixture.of.normals}{Whether to model with mixture of normals instead of LCA.}
 
-\item{algorithm}{If "HB", Hierarchical Bayes with a MVN prior is used and the other parameters are ignored.}
+\item{algorithm}{If "HB" or "HB-Gibbs", Hierarchical Bayes with a MVN prior is used and the other
+parameters are ignored.}
 
 \item{normal.covariance}{The form of the covariance matrix for mixture of normals.
 Can be 'Full, 'Spherical', 'Diagonal'.}
