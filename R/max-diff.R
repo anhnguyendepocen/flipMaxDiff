@@ -22,7 +22,7 @@
 #' @param lc Whether to run latent class step at the end if characteristics are supplied.
 #' @param output Output type. Can be "Probabilities" or "Classes".
 #' @param tasks.left.out Number of questions to leave out for cross-validation.
-#' @param algorithm If "HB" or "HB-Gibbs", Hierarchical Bayes with a MVN prior is used and the other
+#' @param algorithm If "Stan" or "bayesm", Hierarchical Bayes with a MVN prior is used and the other
 #'  parameters are ignored.
 #' @param is.mixture.of.normals Whether to model with mixture of normals instead of LCA.
 #' @param normal.covariance The form of the covariance matrix for mixture of normals.
@@ -46,9 +46,13 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
                        hb.adapt.delta = 0.8, hb.keep.samples = FALSE)
 {
+    # For backwards compatibility
+    if (algorithm == "HB")
+        algorithm <- "Stan"
+
     if (!is.null(weights) && !is.null(characteristics))
         stop("Weights are not able to be applied when characteristics are supplied.")
-    if (!is.null(weights) && (algorithm == "HB" || algorithm == "HB-Gibbs"))
+    if (!is.null(weights) && (algorithm == "Stan" || algorithm == "bayesm"))
         stop("Weights are not able to be applied for Hierarchical Bayes.")
     if (!lc && is.null(characteristics))
         stop("There is no model to run. Select covariates and/or run latent class analysis over respondents.")
@@ -61,12 +65,12 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     dat <- cleanAndCheckData(design, version, best, worst, alternative.names, subset, weights,
                              characteristics, seed, questions.left.out)
 
-    if (algorithm == "HB")
+    if (algorithm == "Stan")
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
                                            hb.adapt.delta, TRUE, seed, hb.keep.samples)
     }
-    else if (algorithm == "HB-Gibbs")
+    else if (algorithm == "bayesm")
     {
         result <- hierarchicalBayesGibbsMaxDiff(dat, hb.iterations, seed)
     }
@@ -190,13 +194,13 @@ print.FitMaxDiff <- function(x, ...)
         "MaxDiff: Varying Coefficients"
     else if (x$is.mixture.of.normals)
         "MaxDiff: Mixture of Normals"
-    else if (x$algorithm == "HB")
+    else if (x$algorithm == "Stan")
         "MaxDiff: Hierarchical Bayes"
     else if (x$algorithm == "HB-Gibbs")
-        "MaxDiff: Hierarchical Bayes (Gibbs sampling)"
+        "MaxDiff: Hierarchical Bayes"
     else
         "MaxDiff: Latent Class Analysis"
-    is.hb <- x$algorithm %in% c("HB", "HB-Gibbs")
+    is.hb <- x$algorithm %in% c("Stan", "bayesm")
     footer <- paste0("n = ", x$n.respondents, "; ")
     if (!is.null(x$subset) && !all(x$subset))
         footer <- paste0(footer, "Filters have been applied; ")

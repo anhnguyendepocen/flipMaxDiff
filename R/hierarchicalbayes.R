@@ -4,7 +4,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
                                      keep.samples = FALSE)
 {
     # We want to replace this call with a proper integration of rstan into this package
-    require(rstan)
+    requireNamespace("rstan")
 
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
