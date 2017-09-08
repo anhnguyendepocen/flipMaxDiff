@@ -44,7 +44,7 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
     respondent.parameters[dat$subset, ] <- resp.pars
     colnames(respondent.parameters) <- dat$alternative.names
 
-    result <- list(respondent.parameters = respondent.parameters)
+    result <- list(respondent.parameters = respondent.parameters, bayesm.output = out)
     class(result) <- "FitMaxDiff"
     result
 }

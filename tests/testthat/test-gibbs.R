@@ -8,20 +8,20 @@ names <- c("Apple", "Microsoft", "IBM", "Google", "Intel", "Samsung", "Sony", "D
 
 test_that("Gibbs", {
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, algorithm = "HB-Gibbs", hb.iterations = 10000)
+                         alternative.names = names, algorithm = "HB-bayesm", hb.iterations = 10000)
     expect_error(print(result), NA)
 })
 
 test_that("Gibbs mixture of normals", {
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, algorithm = "HB-Gibbs", hb.iterations = 10000, n.classes = 2)
+                         alternative.names = names, algorithm = "HB-bayesm", hb.iterations = 10000, n.classes = 2)
     expect_error(print(result), NA)
 })
 
 test_that("Gibbs filter", {
     sub <- unclass(tech.data$Q2) <= 3
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, algorithm = "HB-Gibbs", hb.iterations = 10000,
+                         alternative.names = names, algorithm = "HB-bayesm", hb.iterations = 10000,
                          subset = sub)
     expect_error(print(result), NA)
 })
@@ -29,6 +29,6 @@ test_that("Gibbs filter", {
 test_that("Gibbs weights", {
     wgt <- tech.data$RESPNUM
     expect_error(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, algorithm = "HB-Gibbs", hb.iterations = 10000,
+                         alternative.names = names, algorithm = "HB-bayesm", hb.iterations = 10000,
                          weights = wgt), "Weights are not able to be applied for Hierarchical Bayes.")
 })
