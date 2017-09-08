@@ -11,6 +11,9 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
     n.qc <- n.questions.left.in * n.choices
 
     data <- list()
+    # We permute the order of alternatives in each question using %% when constructing
+    # the design matrix X to ensure that y takes on all possible values in the range,
+    # in order to satisfy input checking done by bayesm.
     for (i in 1:n.respondents)
     {
         X <- matrix(0, nrow = 2 * n.qc, ncol = n.alternatives - 1)
