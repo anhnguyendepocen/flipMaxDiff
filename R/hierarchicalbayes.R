@@ -4,7 +4,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
                                      keep.samples = FALSE)
 {
     # We want to replace this call with a proper integration of rstan into this package
-    requireNamespace("rstan")
+    # requireNamespace("rstan")
 
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
@@ -45,18 +45,18 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
         # devtools::use_data(mod, internal = TRUE, overwrite = TRUE)
         # where model.code is the stan code as a string.
         # Ideally we would want to recompile when the package is built (similar to Rcpp)
-        stan.fit <- sampling(mod, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
+        stan.fit <- rstan::sampling(mod, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
                              control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
     else # windows
     {
-        rstan_options(auto_write = TRUE) # writes a compiled Stan program to the disk to avoid recompiling
-        stan.fit <- stan(file = "exec/hb.stan", data = stan.dat, iter = n.iterations,
+        rstan::rstan_options(auto_write = TRUE) # writes a compiled Stan program to the disk to avoid recompiling
+        stan.fit <- rstan::stan(file = "exec/hb.stan", data = stan.dat, iter = n.iterations,
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
 
-    resp.pars <- colMeans(extract(stan.fit, pars=c("beta"))$beta, dims = 1)
+    resp.pars <- colMeans(rstan::extract(stan.fit, pars=c("beta"))$beta, dims = 1)
     respondent.parameters <- matrix(NA, nrow = length(dat$subset), ncol = ncol(resp.pars))
     respondent.parameters[dat$subset, ] <- resp.pars
     colnames(respondent.parameters) <- dat$alternative.names
