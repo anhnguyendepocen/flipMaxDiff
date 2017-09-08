@@ -15,7 +15,8 @@ Imports: AlgDesign,
          flipTransformations,
          Rcpp (>= 0.12.10),
          rstan,
-         bayesm
+         bayesm,
+         utils
 Suggests: testthat,
          foreign
 LinkingTo: Rcpp

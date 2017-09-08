@@ -1,4 +1,5 @@
 #' @importFrom bayesm rhierMnlRwMixture
+#' @importFrom utils capture.output
 hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 1)
 {
     set.seed(seed)
