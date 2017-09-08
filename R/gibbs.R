@@ -32,7 +32,7 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
         data[[i]] <- list(y = y, X = X)
     }
 
-    out <- invisible(rhierMnlRwMixture(Data = list(lgtdata = data, p = n.choices),
+    capture.output(out <- rhierMnlRwMixture(Data = list(lgtdata = data, p = n.choices),
                              Prior = list(ncomp = n.classes),
                              Mcmc = list(R = n.draws, nprint = 0)))
 
@@ -44,7 +44,7 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
     respondent.parameters[dat$subset, ] <- resp.pars
     colnames(respondent.parameters) <- dat$alternative.names
 
-    result <- list(respondent.parameters = respondent.parameters, bayesm.output = out)
+    result <- list(respondent.parameters = respondent.parameters)
     class(result) <- "FitMaxDiff"
     result
 }
