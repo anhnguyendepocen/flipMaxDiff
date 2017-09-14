@@ -19,7 +19,7 @@ transformed parameters {
     vector<lower=0>[K] sigma;
     matrix[K, K] L_sigma;
     vector[C] XB[R, S];
-    vector[K] theta;
+    vector[K] theta; // sums to zero
     vector[K] beta[R];
 
     sigma = 2.5 * tan(sigma_unif);

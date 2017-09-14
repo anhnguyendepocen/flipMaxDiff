@@ -68,7 +68,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     if (algorithm == "HB-Stan")
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
-                                           hb.adapt.delta, TRUE, seed, hb.keep.samples)
+                                           hb.adapt.delta, TRUE, seed, hb.keep.samples, n.classes)
     }
     else if (algorithm == "HB-bayesm")
     {
