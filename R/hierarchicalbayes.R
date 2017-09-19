@@ -27,6 +27,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     {
         rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
         stan.file <- if (n.classes > 1) "exec/mixtureofnormals.stan" else "exec/hb.stan"
+        # stan.file <- "exec/rankorderedlogit.stan"
         stan.fit <- stan(file = stan.file, data = stan.dat, iter = n.iterations,
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))

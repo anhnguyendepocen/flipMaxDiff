@@ -1,3 +1,13 @@
+functions {
+    real tricked_logit_lpmf(int[] y, vector xb)
+    {
+        real result = 0;
+        result = result + categorical_logit_lpmf(y[1] | xb);
+        result = result + categorical_logit_lpmf(y[2] | -xb);
+        return result;
+    }
+}
+
 data {
     int<lower=2> C; // Number of alternatives (choices) in each scenario
     int<lower=1> K; // Number of alternatives
@@ -48,8 +58,10 @@ model {
     //likelihood
     for (r in 1:R) {
         for (s in 1:S) {
-            YB[r,s] ~ categorical_logit(XB[r,s]);
-            YW[r,s] ~ categorical_logit(-XB[r,s]);
+            int Y[2];
+            Y[1] = YB[r, s];
+            Y[2] = YW[r, s];
+            Y ~ tricked_logit(XB[r, s]);
         }
     }
 }
