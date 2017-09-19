@@ -36,9 +36,9 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
         data[[i]] <- list(y = y, X = X)
     }
 
-    capture.output(out <- rhierMnlRwMixture(Data = list(lgtdata = data, p = n.choices),
+    out <- rhierMnlRwMixture(Data = list(lgtdata = data, p = n.choices),
                              Prior = list(ncomp = n.classes),
-                             Mcmc = list(R = n.draws, nprint = 0)))
+                             Mcmc = list(R = n.draws, nprint = 0))
 
     resp.pars <- matrix(NA, nrow = n.respondents, ncol = n.alternatives)
     draws.to.use <- ceiling(0.5 * n.draws):n.draws

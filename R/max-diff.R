@@ -72,7 +72,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     }
     else if (algorithm == "HB-bayesm")
     {
-        result <- hierarchicalBayesGibbsMaxDiff(dat, hb.iterations, seed)
+        result <- hierarchicalBayesGibbsMaxDiff(dat, hb.iterations, seed, n.classes)
     }
     else if (is.null(characteristics))
     {
