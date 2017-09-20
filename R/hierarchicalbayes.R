@@ -1,12 +1,12 @@
 #' @importFrom rstan rstan_options stan extract sampling
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
-                                     adapt.delta = 0.8, is.tricked = FALSE, seed = 123,
+                                     adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
 
-    stan.dat <- createStanData(dat, n.classes)
+    stan.dat <- createStanData(dat, n.classes, is.tricked)
 
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
@@ -27,7 +27,6 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     {
         rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
         stan.file <- if (n.classes > 1) "exec/mixtureofnormals.stan" else "exec/hb.stan"
-        # stan.file <- "exec/rankorderedlogit.stan"
         stan.fit <- stan(file = stan.file, data = stan.dat, iter = n.iterations,
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
@@ -40,7 +39,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     result
 }
 
-createStanData <- function(dat, n.classes)
+createStanData <- function(dat, n.classes, is.tricked)
 {
     n.choices <- ncol(dat$X.in)
     n.alternatives <- dat$n.alternatives
@@ -68,7 +67,8 @@ createStanData <- function(dat, n.classes)
                      S = n.questions.left.in,
                      YB = Y.best,
                      YW = Y.worst,
-                     X = X)
+                     X = X,
+                     logit_type = ifelse(is.tricked, 1, 2))
 
     if (n.classes > 1)
         stan.dat$P <- n.classes
@@ -88,9 +88,9 @@ reduceStanFitSize <- function(stan.fit)
 
     # Set samples to zero to save space
     nms <- names(stan.fit@sim$samples[[1]])
-    nms <- nms[grepl("XB", nms) | grepl("beta", nms) | grepl("standard_normal", nms) |
-                   grepl("theta_raw", nms) | grepl("sigma_unif", nms) | grepl("L_omega", nms) |
-                   grepl("L_sigma", nms)]
+    re <- paste(c("XB", "beta", "standard_normal", "theta_raw", "sigma_unif", "L_omega", "L_sigma",
+                  "posterior_prob", "class_weights"), collapse = "|")
+    nms <- nms[grepl(re, nms)]
     for (i in 1:stan.fit@sim$chains)
     {
         for (nm in nms)
