@@ -14,7 +14,7 @@
 #' used in the fitting process.
 #' @param weights An optional vector of sampling or frequency weights.
 #' @param characteristics Data frame of characteristics on which to run varying coefficients by latent class boosting.
-#' @param seed Seed for initial random class assignments.
+#' @param seed Random seed.
 #' @param initial.parameters Specify initial parameters intead of starting at random.
 #' @param sub.model.outputs If TRUE, prints diagnostics on interim models.
 #' @param trace Non-negative integer indicating the detail of outputs provided when fitting models: 0 indicates
@@ -60,10 +60,10 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
         stop("Mixture of normals cannot be selected when characteristics are supplied.")
 
     apply.weights <- is.null(characteristics)
-    questions.left.out <- tasks.left.out # we now refer to tasks as questions
+    n.questions.left.out <- tasks.left.out # we now refer to tasks as questions
 
     dat <- cleanAndCheckData(design, version, best, worst, alternative.names, subset, weights,
-                             characteristics, seed, questions.left.out)
+                             characteristics, seed, n.questions.left.out)
 
     if (algorithm == "HB-Stan")
     {
@@ -87,7 +87,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
         result <- varyingCoefficientsMaxDiff(dat, n.classes, seed, initial.parameters, trace, apply.weights,
                                              lc, sub.model.outputs, lc.tolerance, is.tricked)
 
-    result <- accuracyResults(dat, result, questions.left.out)
+    result <- accuracyResults(dat, result, n.questions.left.out)
     if (sub.model.outputs)
         cat("Latent class analysis",
             "BIC:", result$bic,
@@ -101,7 +101,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     result$n.alternatives.per.task <- ncol(dat$X.in)
     result$output <- output
     result$lc <- lc
-    result$questions.left.out <- questions.left.out
+    result$n.questions.left.out <- n.questions.left.out
 
     resp.pars <- as.matrix(RespondentParameters(result))[dat$subset, ]
     result$respondent.probabilities <- exp(resp.pars) / rowSums(exp(resp.pars))
@@ -112,7 +112,6 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
 
 predictionAccuracies <- function(object, X, n.questions, subset)
 {
-    score <- rep(NA, nrow(X))
     resp.pars <- as.matrix(RespondentParameters(object)[subset, ])
     n.respondents <- nrow(resp.pars)
     result <- rep(NA, n.respondents)
@@ -131,15 +130,15 @@ predictionAccuracies <- function(object, X, n.questions, subset)
     result
 }
 
-accuracyResults <- function(dat, result, questions.left.out)
+accuracyResults <- function(dat, result, n.questions.left.out)
 {
     n.respondents <- length(dat$respondent.indices)
-    in.sample.accuracies <- predictionAccuracies(result, dat$X.in, dat$n.questions.in, dat$subset)
-    w <- dat$weights[(1:n.respondents) * dat$n.questions.in]
+    in.sample.accuracies <- predictionAccuracies(result, dat$X.in, dat$n.questions.left.in, dat$subset)
+    w <- dat$weights[(1:n.respondents) * dat$n.questions.left.in]
     result$in.sample.accuracy <- sum(in.sample.accuracies * w) / sum(w)
-    if (questions.left.out > 0)
+    if (n.questions.left.out > 0)
     {
-        result$prediction.accuracies <- predictionAccuracies(result, dat$X.out, questions.left.out, dat$subset)
+        result$prediction.accuracies <- predictionAccuracies(result, dat$X.out, n.questions.left.out, dat$subset)
         result$out.sample.accuracy <- sum(result$prediction.accuracies * w) / sum(w)
     }
     else
@@ -182,7 +181,7 @@ Memberships <- function(object)
     apply(pp, 1, .fun)
 }
 
-#' \code{print.CorrespondenceAnalysis}
+#' @title print.FitMaxDiff
 #' @param x FitMaxDiff object.
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
@@ -193,7 +192,7 @@ print.FitMaxDiff <- function(x, ...)
     is.hb <- x$algorithm %in% c("HB-Stan", "HB-bayesm")
     title <- if (!is.null(x$covariates.notes))
         "MaxDiff: Varying Coefficients"
-    else if (x$is.mixture.of.normals)
+    else if (!is.null(x$is.mixture.of.normals) && x$is.mixture.of.normals)
         "MaxDiff: Mixture of Normals"
     else if (is.hb)
         "MaxDiff: Hierarchical Bayes"
@@ -206,10 +205,10 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "Weights have been applied; Effective sample size: ",
                          FormatAsReal(x$effective.sample.size, decimals = 2), "; ")
     footer <- paste0(footer, "Number of questions: ", x$n.questions, "; ")
-    if (x$questions.left.out > 0)
+    if (x$n.questions.left.out > 0)
     {
-        footer <- paste0(footer, "Questions used in estimation: ", x$n.questions - x$questions.left.out, "; ")
-        footer <- paste0(footer, "Questions left out: ", x$questions.left.out, "; ")
+        footer <- paste0(footer, "Questions used in estimation: ", x$n.questions - x$n.questions.left.out, "; ")
+        footer <- paste0(footer, "Questions left out: ", x$n.questions.left.out, "; ")
     }
     footer <- paste0(footer, "Alternatives per question: ", x$n.alternatives.per.task, "; ")
     if (!is.hb)
@@ -218,9 +217,9 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "BIC: ", FormatAsReal(x$bic, decimals = 2), "; ")
     }
 
-    footer <- if (!x$lc && !is.hb && !x$is.mixture.of.normals)
+    footer <- if (!is.hb && !x$lc && !x$is.mixture.of.normals)
         paste0(footer, "Latent class analysis over respondents not applied; ")
-    else if (x$is.mixture.of.normals)
+    else if (!is.null(x$is.mixture.of.normals) && x$is.mixture.of.normals)
     {
         if (x$n.classes == 1)
             paste0(footer, "Mixture of normals: ", x$n.classes, " class; ")
@@ -238,13 +237,13 @@ print.FitMaxDiff <- function(x, ...)
     }
 
     subtitle <- if (!is.na(x$out.sample.accuracy))
-        paste0("Prediction accuracy (leave-", x$questions.left.out , "-out cross-validation): ",
+        paste0("Prediction accuracy (leave-", x$n.questions.left.out , "-out cross-validation): ",
                FormatAsPercent(x$out.sample.accuracy, 3))
     else
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
     if (x$n.classes == 1 && is.null(x$covariates.notes)
-        && ((!x$is.mixture.of.normals && !is.hb) || x$output == "Classes"))
+        && ((!is.hb && !x$is.mixture.of.normals) || x$output == "Classes"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)

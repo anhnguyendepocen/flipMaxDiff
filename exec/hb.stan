@@ -87,10 +87,10 @@ functions {
 }
 
 data {
-    int<lower=2> C; // Number of alternatives (choices) in each scenario
+    int<lower=2> C; // Number of alternatives (choices) in each question
     int<lower=1> K; // Number of alternatives
     int<lower=1> R; // Number of respondents
-    int<lower=1> S; // Number of scenarios per respondent
+    int<lower=1> S; // Number of questions per respondent
     int<lower=1,upper=C> YB[R, S]; // best choices
     int<lower=1,upper=C> YW[R, S]; // worst choices
     matrix[C, K] X[R, S]; // matrix of attributes for each obs

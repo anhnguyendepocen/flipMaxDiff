@@ -2,7 +2,7 @@ varyingCoefficientsMaxDiff <- function(dat, n.classes, seed, initial.parameters,
                                        sub.model.outputs, lc.tolerance, is.tricked)
 {
     n.respondents <- length(dat$respondent.indices)
-    n.questions.in <- dat$n.questions.in
+    n.questions.left.in <- dat$n.questions.left.in
     alternative.names <- dat$alternative.names
     resp.pars <- NULL
     n.previous.parameters <- 0
@@ -16,7 +16,7 @@ varyingCoefficientsMaxDiff <- function(dat, n.classes, seed, initial.parameters,
         covariates.notes <- character(n.characteristics)
         for (i in 1:n.characteristics)
         {
-            ind.levels <- getLevelIndices(characteristics[[i]], n.questions.in)
+            ind.levels <- getLevelIndices(characteristics[[i]], n.questions.left.in)
             n.levels <- length(ind.levels)
             best.bic <- Inf
             best.solution <- NULL

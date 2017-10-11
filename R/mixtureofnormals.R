@@ -4,7 +4,7 @@ mixtureOfNormalsMaxDiff <- function(dat, n.classes, normal.covariance, seed = 12
 {
     n.respondents <- length(dat$respondent.indices)
     n.beta <- dat$n.alternatives - 1
-    n.questions <- dat$n.questions.in
+    n.questions <- dat$n.questions.left.in
     max.iterations.since.best <- 20
     X <- dat$X.in
     weights <- dat$weights

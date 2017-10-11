@@ -9,9 +9,10 @@
 #' the design shown to each respondent. Coerced to a matrix if a \code{data.frame}.
 #' @param worst As with 'best', except denoting worst..
 #' @param seed Seed for cross validation
-#' @param questions.left.out Number of questions to leave out for cross-validation.
+#' @param n.questions.left.out Number of questions to leave out for cross-validation.
+#' @importFrom flipChoice LeftOutQuestions
 #' @export
-IntegrateDesignAndData <- function(design, version, best, worst, seed, questions.left.out = 0)
+IntegrateDesignAndData <- function(design, version, best, worst, seed, n.questions.left.out = 0)
 {
     n <- length(version)
     if (n != nrow(best) | n != nrow(worst))
@@ -43,7 +44,7 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, questions
         }
     }
 
-    if (questions.left.out == 0)
+    if (n.questions.left.out == 0)
     {
         X.in <- X
         X.out <- NULL
@@ -52,12 +53,12 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, questions
     }
     else
     {
-        left.out <- leftOutQuestions(n, n.questions, questions.left.out, seed)
+        left.out <- LeftOutQuestions(n, n.questions, n.questions.left.out, seed)
         X.in <- X[!left.out, ]
         X.out <- X[left.out, ]
-        questions.left.in <- n.questions - questions.left.out
+        n.questions.left.in <- n.questions - n.questions.left.out
         for (i in 1:n)
-            respondent.indices[[i]] <- (1:questions.left.in) + (i - 1) * questions.left.in
+            respondent.indices[[i]] <- (1:n.questions.left.in) + (i - 1) * n.questions.left.in
     }
 
     list(X.in = X.in, X.out = X.out, respondent.indices = respondent.indices)
@@ -66,7 +67,7 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, questions
 #' @importFrom flipData CalibrateWeight CleanSubset CleanWeights
 #' @importFrom flipFormat TrimWhitespace
 cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.names, subset = NULL, weights = NULL,
-                              characteristics = NULL, seed, questions.left.out = 0)
+                              characteristics = NULL, seed, n.questions.left.out = 0)
 {
     n <- nrow(best)
     # Tidying weights and subset
@@ -149,14 +150,14 @@ cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.n
         n.questions <- nrow(design)
     n <- sum(subset)
     # Number of questions
-    if (questions.left.out >= n.questions)
+    if (n.questions.left.out >= n.questions)
         stop("The number of questions left out must be less than the total number of questions.")
-    questions.left.in <- n.questions - questions.left.out
+    n.questions.left.in <- n.questions - n.questions.left.out
     weights <- if (is.null(weights))
-        rep(1, questions.left.in * n) else rep(weights, each = questions.left.in)
+        rep(1, n.questions.left.in * n) else rep(weights, each = n.questions.left.in)
     best <- as.data.frame(best[subset, ])
     worst <- as.data.frame(worst[subset, ])
-    dat <- IntegrateDesignAndData(design, version, best, worst, seed, questions.left.out)
+    dat <- IntegrateDesignAndData(design, version, best, worst, seed, n.questions.left.out)
     if (!is.null(characteristics))
         characteristics <- characteristics[subset, , drop = FALSE]
     list(X.in = dat$X.in,
@@ -166,14 +167,8 @@ cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.n
          n = n,
          n.alternatives = n.alternatives,
          n.questions = n.questions,
-         n.questions.in = questions.left.in,
+         n.questions.left.in = n.questions.left.in,
          respondent.indices = dat$respondent.indices,
          characteristics = characteristics,
          subset = subset)
-}
-
-leftOutQuestions <- function(n.respondents, n.questions, n.questions.left.out, seed)
-{
-    set.seed(seed)
-    sapply(rep(n.questions, n.respondents), function(x) (1:n.questions) %in% sample(x, n.questions.left.out))
 }

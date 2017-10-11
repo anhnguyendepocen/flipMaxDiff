@@ -38,7 +38,7 @@ used in the fitting process.}
 
 \item{characteristics}{Data frame of characteristics on which to run varying coefficients by latent class boosting.}
 
-\item{seed}{Seed for initial random class assignments.}
+\item{seed}{Random seed.}
 
 \item{initial.parameters}{Specify initial parameters intead of starting at random.}
 

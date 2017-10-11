@@ -5,7 +5,7 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
     n.respondents <- length(dat$respondent.indices)
     n.levels <- length(ind.levels)
     n.beta <- dat$n.alternatives - 1
-    n.questions <- dat$n.questions.in
+    n.questions <- dat$n.questions.left.in
     n.choices <- ncol(dat$X.in)
     X <- dat$X.in
     weights <- dat$weights

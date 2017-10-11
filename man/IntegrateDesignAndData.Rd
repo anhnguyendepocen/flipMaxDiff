@@ -5,7 +5,7 @@
 \title{\code{IntegrateDesignAndData}}
 \usage{
 IntegrateDesignAndData(design, version, best, worst, seed,
-  questions.left.out = 0)
+  n.questions.left.out = 0)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Question',
@@ -21,7 +21,7 @@ the design shown to each respondent. Coerced to a matrix if a \code{data.frame}.
 
 \item{seed}{Seed for cross validation}
 
-\item{questions.left.out}{Number of questions to leave out for cross-validation.}
+\item{n.questions.left.out}{Number of questions to leave out for cross-validation.}
 }
 \description{
 A matrix where in each row, the first element is the 'best' choice and the last element is the

@@ -1,4 +1,5 @@
 #' @importFrom rstan rstan_options stan extract sampling
+#' @importFrom flipChoice ReduceStanFitSize
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1)
@@ -34,7 +35,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
 
     result <- list()
     result$respondent.parameters <- computeRespParsStan(stan.fit, dat)
-    result$stan.fit <- if (keep.samples) stan.fit else reduceStanFitSize(stan.fit)
+    result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
     class(result) <- "FitMaxDiff"
     result
 }
@@ -45,7 +46,7 @@ createStanData <- function(dat, n.classes, is.tricked)
     n.alternatives <- dat$n.alternatives
     n.respondents <- dat$n
     n.questions <- dat$n.questions
-    n.questions.left.in <- dat$n.questions.in
+    n.questions.left.in <- dat$n.questions.left.in
 
     X <- array(dim = c(n.respondents, n.questions.left.in, n.choices, n.alternatives))
     Y.best <- array(1, dim = c(n.respondents, n.questions.left.in))
@@ -74,32 +75,6 @@ createStanData <- function(dat, n.classes, is.tricked)
         stan.dat$P <- n.classes
 
     stan.dat
-}
-
-# This function reduces the size of the stan.fit object to reduce the time
-# it takes to return it from the R server.
-reduceStanFitSize <- function(stan.fit)
-{
-    # Replace stanmodel with a dummy as stanmodel makes the output many times larger,
-    # and is not required for diagnostic plots.
-    dummy.stanmodel <- ""
-    class(dummy.stanmodel) <- "stanmodel"
-    stan.fit@stanmodel <- dummy.stanmodel
-
-    # Set samples to zero to save space
-    nms <- names(stan.fit@sim$samples[[1]])
-    re <- paste(c("XB", "beta", "standard_normal", "theta_raw", "sigma_unif", "L_omega", "L_sigma",
-                  "posterior_prob", "class_weights"), collapse = "|")
-    nms <- nms[grepl(re, nms)]
-    for (i in 1:stan.fit@sim$chains)
-    {
-        for (nm in nms)
-            stan.fit@sim$samples[[i]][[nm]] <- 0
-        attr(stan.fit@sim$samples[[i]], "inits") <- NULL
-        attr(stan.fit@sim$samples[[i]], "mean_pars") <- NULL
-    }
-    stan.fit@inits <- list()
-    stan.fit
 }
 
 computeRespParsStan <- function(stan.fit, dat)

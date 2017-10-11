@@ -7,7 +7,7 @@ hierarchicalBayesGibbsMaxDiff <- function(dat, n.draws, seed = 123, n.classes = 
     n.choices <- ncol(dat$X.in)
     n.alternatives <- dat$n.alternatives
     n.respondents <- dat$n
-    n.questions.left.in <- dat$n.questions.in
+    n.questions.left.in <- dat$n.questions.left.in
     n.qc <- n.questions.left.in * n.choices
 
     data <- list()
