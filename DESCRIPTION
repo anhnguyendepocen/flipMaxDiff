@@ -13,6 +13,7 @@ Imports: AlgDesign,
          flipData,
          flipFormat,
          flipTransformations,
+         flipChoice,
          Rcpp (>= 0.12.10),
          rstan,
          bayesm,
@@ -22,6 +23,7 @@ Suggests: testthat,
 LinkingTo: Rcpp
 Remotes: Displayr/flipData,
          Displayr/flipFormat,
-         Displayr/flipTransformations
+         Displayr/flipTransformations,
+         Displayr/flipChoice
 RoxygenNote: 6.0.1
 Depends: R(>= 2.10.0)

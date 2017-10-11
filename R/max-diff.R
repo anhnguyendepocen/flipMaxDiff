@@ -182,6 +182,7 @@ Memberships <- function(object)
 }
 
 #' @title print.FitMaxDiff
+#' @description Print a FitMaxDiff object
 #' @param x FitMaxDiff object.
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
