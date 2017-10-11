@@ -1,5 +1,5 @@
 #' @importFrom rstan rstan_options stan extract sampling
-#' @importFrom flipChoice ReduceStanFitSize
+#' @importFrom flipChoice ReduceStanFitSize ComputeRespPars
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1)
@@ -34,7 +34,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     }
 
     result <- list()
-    result$respondent.parameters <- computeRespParsStan(stan.fit, dat)
+    result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
     result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
     class(result) <- "FitMaxDiff"
     result
@@ -75,33 +75,4 @@ createStanData <- function(dat, n.classes, is.tricked)
         stan.dat$P <- n.classes
 
     stan.dat
-}
-
-computeRespParsStan <- function(stan.fit, dat)
-{
-    n.respondents <- dat$n
-    n.alternatives <- dat$n.alternatives
-    alternative.names <- dat$alternative.names
-    subset <- dat$subset
-
-    beta <- extract(stan.fit, pars=c("beta"))$beta
-    resp.pars.subset <- matrix(NA, n.respondents, n.alternatives)
-    if (length(dim(beta)) == 4) # n.classes > 1
-    {
-        pp <- exp(extract(stan.fit, pars=c("posterior_prob"))$posterior_prob)
-        for (i in 1:n.respondents)
-            pp[, i, ] <- pp[, i, ] / rowSums(pp[, i, ])
-
-        for (j in 1:n.alternatives)
-            for (i in 1:n.respondents)
-                resp.pars.subset[i, j] <- mean(beta[, i, , j] * pp[, i, ])
-        resp.pars.subset
-    }
-    else
-        resp.pars.subset <- colMeans(beta, dims = 1)
-
-    result <- matrix(NA, nrow = length(subset), ncol = ncol(resp.pars.subset))
-    result[subset, ] <- resp.pars.subset
-    colnames(result) <- alternative.names
-    result
 }
