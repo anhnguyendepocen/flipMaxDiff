@@ -2,7 +2,7 @@
 % Please edit documentation in R/max-diff.R
 \name{print.FitMaxDiff}
 \alias{print.FitMaxDiff}
-\title{\code{print.CorrespondenceAnalysis}}
+\title{print.FitMaxDiff}
 \usage{
 \method{print}{FitMaxDiff}(x, ...)
 }
@@ -10,7 +10,4 @@
 \item{x}{FitMaxDiff object.}
 
 \item{...}{further arguments passed to or from other methods.}
-}
-\description{
-\code{print.CorrespondenceAnalysis}
 }
