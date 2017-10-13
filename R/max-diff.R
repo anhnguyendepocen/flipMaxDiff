@@ -261,7 +261,9 @@ print.FitMaxDiff <- function(x, ...)
         colnames(stats.table) <- "Mean Probability (%)"
 
         HistTable(100 * probs, title = title, subtitle = subtitle, footer = footer,
-                  bin.size = 5, bin.min = 0, bin.max = 100, hist.width = 100, hist.height = 20, stats.table)
+                  bin.size = 5, bin.min = 0, bin.max = 100, hist.width = 100, hist.height = 20,
+                  show.tooltips = TRUE, color.negative = FALSE,
+                  histogram.column.name = "Distribution", stats.table)
     }
     else if (x$output == "Classes")
     {
