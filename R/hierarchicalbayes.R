@@ -35,6 +35,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
 
     result <- list()
     result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
+    result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
     result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
     class(result) <- "FitMaxDiff"
     result
