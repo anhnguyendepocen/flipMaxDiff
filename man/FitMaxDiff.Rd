@@ -7,7 +7,7 @@
 FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   n.classes = 1, subset = NULL, weights = NULL, characteristics = NULL,
   seed = 123, initial.parameters = NULL, trace = 0,
-  sub.model.outputs = FALSE, lc = TRUE, output = "Probabilities",
+  sub.model.outputs = FALSE, lc = TRUE, output = "Default",
   tasks.left.out = 0, is.mixture.of.normals = FALSE,
   algorithm = "Default", normal.covariance = "Full",
   pool.variance = FALSE, lc.tolerance = 1e-04, n.draws = 100,
