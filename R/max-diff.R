@@ -194,7 +194,8 @@ Memberships <- function(object)
 print.FitMaxDiff <- function(x, ...)
 {
     is.hb <- x$algorithm %in% c("HB-Stan", "HB-bayesm")
-    title <- if (!is.null(x$covariates.notes))
+    has.covariates <- !is.null(x$covariates.notes)
+    title <- if (has.covariates)
         "MaxDiff: Varying Coefficients"
     else if (!is.null(x$is.mixture.of.normals) && x$is.mixture.of.normals)
         "MaxDiff: Mixture of Normals"
@@ -250,13 +251,15 @@ print.FitMaxDiff <- function(x, ...)
     {
         if (is.hb)
             "Parameters"
-        else
+        else if (!has.covariates)
             "Classes"
+        else
+            "Probabilities"
     }
     else
         x$output
 
-    if (x$n.classes == 1 && is.null(x$covariates.notes)
+    if (x$n.classes == 1 && !has.covariates
         && ((!is.hb && !x$is.mixture.of.normals) || output == "Classes"))
     {
         col.labels <- "Probabilities (%)"
@@ -264,7 +267,7 @@ print.FitMaxDiff <- function(x, ...)
     }
     else if (output == "Probabilities")
     {
-        if (!is.null(x$covariates.notes))
+        if (has.covariates)
             subtitle <- c(subtitle, paste0("Covariates: ", paste(x$covariates.notes, collapse = ", ")))
 
         probs <- x$respondent.probabilities
@@ -280,7 +283,7 @@ print.FitMaxDiff <- function(x, ...)
     }
     else if (output == "Classes")
     {
-        if (!is.null(x$covariates.notes))
+        if (has.covariates)
             stop("Class table cannot be displayed when covariates are applied.")
         col.labels <- c(paste("Class", 1:x$n.classes, "(%)<br>Size:", FormatAsPercent(x$class.sizes, 3)), "Total")
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
