@@ -36,15 +36,16 @@
 #' @param hb.max.tree.depth http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
 #' @param hb.adapt.delta http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
 #' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
+#' @param hb.stanfit Whether to include the stanfit property.
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
                        initial.parameters = NULL, trace = 0, sub.model.outputs = FALSE, lc = TRUE,
-                       output = "Probabilities", tasks.left.out = 0, is.mixture.of.normals = FALSE,
+                       output = "Default", tasks.left.out = 0, is.mixture.of.normals = FALSE,
                        algorithm = "Default", normal.covariance = "Full", pool.variance = FALSE,
-                       lc.tolerance = 0.0001, n.draws = 100, is.tricked = FALSE,
+                       lc.tolerance = 0.0001, n.draws = 100, is.tricked = TRUE,
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
-                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE)
+                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE)
 {
     # For backwards compatibility
     if (algorithm == "HB")
@@ -68,7 +69,8 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     if (algorithm == "HB-Stan")
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
-                                           hb.adapt.delta, is.tricked, seed, hb.keep.samples, n.classes)
+                                           hb.adapt.delta, is.tricked, seed, hb.keep.samples,
+                                           n.classes, hb.stanfit)
     }
     else if (algorithm == "HB-bayesm")
     {
@@ -186,6 +188,7 @@ Memberships <- function(object)
 #' @param x FitMaxDiff object.
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
+#' @importFrom flipChoice RespondentParametersTable
 #' @importFrom stats median quantile
 #' @export
 print.FitMaxDiff <- function(x, ...)
@@ -243,6 +246,9 @@ print.FitMaxDiff <- function(x, ...)
     else
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
+    if (output == "Default")
+        output = if (hb) "Parameters" else "Classes"
+
     if (x$n.classes == 1 && is.null(x$covariates.notes)
         && ((!is.hb && !x$is.mixture.of.normals) || x$output == "Classes"))
     {
@@ -272,4 +278,6 @@ print.FitMaxDiff <- function(x, ...)
         col.labels <- c(paste("Class", 1:x$n.classes, "(%)<br>Size:", FormatAsPercent(x$class.sizes, 3)), "Total")
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
     }
+    else if (x$output == "Parameters")
+        RespondentParametersTable(x$respondent.parameters, title, subtitle, footer)
 }

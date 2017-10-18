@@ -2,7 +2,7 @@
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
-                                     keep.samples = FALSE, n.classes = 1)
+                                     keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
@@ -35,8 +35,11 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
 
     result <- list()
     result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
-    result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
-    result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
+    if (include.stanfit)
+    {
+        result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
+        result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
+    }
     class(result) <- "FitMaxDiff"
     result
 }
