@@ -20,7 +20,7 @@
 #' @param trace Non-negative integer indicating the detail of outputs provided when fitting models: 0 indicates
 #' no outputs, and 6 is the most detailed outputs.
 #' @param lc Whether to run latent class step at the end if characteristics are supplied.
-#' @param output Output type. Can be "Probabilities" or "Classes".
+#' @param output Output type. Can be "Default", "Probabilities" or "Classes".
 #' @param tasks.left.out Number of questions to leave out for cross-validation.
 #' @param algorithm If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
 #'  parameters are ignored.
@@ -246,16 +246,23 @@ print.FitMaxDiff <- function(x, ...)
     else
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
-    if (output == "Default")
-        output = if (hb) "Parameters" else "Classes"
+    output <- if (x$output == "Default")
+    {
+        if (is.hb)
+            "Parameters"
+        else
+            "Classes"
+    }
+    else
+        x$output
 
     if (x$n.classes == 1 && is.null(x$covariates.notes)
-        && ((!is.hb && !x$is.mixture.of.normals) || x$output == "Classes"))
+        && ((!is.hb && !x$is.mixture.of.normals) || output == "Classes"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
     }
-    else if (x$output == "Probabilities")
+    else if (output == "Probabilities")
     {
         if (!is.null(x$covariates.notes))
             subtitle <- c(subtitle, paste0("Covariates: ", paste(x$covariates.notes, collapse = ", ")))
@@ -271,13 +278,13 @@ print.FitMaxDiff <- function(x, ...)
                   show.tooltips = TRUE, color.negative = FALSE,
                   histogram.column.name = "Distribution", stats.table)
     }
-    else if (x$output == "Classes")
+    else if (output == "Classes")
     {
         if (!is.null(x$covariates.notes))
             stop("Class table cannot be displayed when covariates are applied.")
         col.labels <- c(paste("Class", 1:x$n.classes, "(%)<br>Size:", FormatAsPercent(x$class.sizes, 3)), "Total")
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
     }
-    else if (x$output == "Parameters")
+    else if (output == "Parameters")
         RespondentParametersTable(x$respondent.parameters, title, subtitle, footer)
 }
