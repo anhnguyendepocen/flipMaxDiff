@@ -8,12 +8,10 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   n.classes = 1, subset = NULL, weights = NULL, characteristics = NULL,
   seed = 123, initial.parameters = NULL, trace = 0,
   sub.model.outputs = FALSE, lc = TRUE, output = "Default",
-  tasks.left.out = 0, is.mixture.of.normals = FALSE,
-  algorithm = "Default", normal.covariance = "Full",
-  pool.variance = FALSE, lc.tolerance = 1e-04, n.draws = 100,
-  is.tricked = TRUE, hb.iterations = 500, hb.chains = 8,
-  hb.max.tree.depth = 10, hb.adapt.delta = 0.8, hb.keep.samples = FALSE,
-  hb.stanfit = TRUE)
+  tasks.left.out = 0, algorithm = "Default", normal.covariance = "Full",
+  pool.variance = FALSE, lc.tolerance = 1e-04, is.tricked = TRUE,
+  hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
+  hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
@@ -50,23 +48,19 @@ no outputs, and 6 is the most detailed outputs.}
 
 \item{lc}{Whether to run latent class step at the end if characteristics are supplied.}
 
-\item{output}{Output type. Can be "Probabilities" or "Classes".}
+\item{output}{Output type. Can be "Default", "Probabilities" or "Classes".}
 
 \item{tasks.left.out}{Number of questions to leave out for cross-validation.}
-
-\item{is.mixture.of.normals}{Whether to model with mixture of normals instead of LCA.}
 
 \item{algorithm}{If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
 parameters are ignored.}
 
-\item{normal.covariance}{The form of the covariance matrix for mixture of normals.
+\item{normal.covariance}{The form of the covariance matrix for Hierarchical Bayes.
 Can be 'Full, 'Spherical', 'Diagonal'.}
 
 \item{pool.variance}{Whether to pool parameter covariances between classes in mixture of normals.}
 
 \item{lc.tolerance}{The tolerance used for defining convergence in latent class analysis.}
-
-\item{n.draws}{The number of draws when fitting mixture of normals.}
 
 \item{is.tricked}{Whether to use tricked logit instead of rank-ordered logit with ties.}
 

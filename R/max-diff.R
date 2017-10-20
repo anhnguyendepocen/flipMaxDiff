@@ -24,12 +24,10 @@
 #' @param tasks.left.out Number of questions to leave out for cross-validation.
 #' @param algorithm If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
 #'  parameters are ignored.
-#' @param is.mixture.of.normals Whether to model with mixture of normals instead of LCA.
-#' @param normal.covariance The form of the covariance matrix for mixture of normals.
+#' @param normal.covariance The form of the covariance matrix for Hierarchical Bayes.
 #' Can be 'Full, 'Spherical', 'Diagonal'.
 #' @param pool.variance Whether to pool parameter covariances between classes in mixture of normals.
 #' @param lc.tolerance The tolerance used for defining convergence in latent class analysis.
-#' @param n.draws The number of draws when fitting mixture of normals.
 #' @param is.tricked Whether to use tricked logit instead of rank-ordered logit with ties.
 #' @param hb.iterations The number of iterations in Hierarchical Bayes.
 #' @param hb.chains The number of chains in Hierarchical Bayes.
@@ -41,9 +39,9 @@
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
                        initial.parameters = NULL, trace = 0, sub.model.outputs = FALSE, lc = TRUE,
-                       output = "Default", tasks.left.out = 0, is.mixture.of.normals = FALSE,
+                       output = "Default", tasks.left.out = 0,
                        algorithm = "Default", normal.covariance = "Full", pool.variance = FALSE,
-                       lc.tolerance = 0.0001, n.draws = 100, is.tricked = TRUE,
+                       lc.tolerance = 0.0001, is.tricked = TRUE,
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
                        hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE)
 {
@@ -57,8 +55,6 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
         stop("Weights are not able to be applied for Hierarchical Bayes.")
     if (!lc && is.null(characteristics))
         stop("There is no model to run. Select covariates and/or run latent class analysis over respondents.")
-    if (!is.null(characteristics) && is.mixture.of.normals)
-        stop("Mixture of normals cannot be selected when characteristics are supplied.")
 
     apply.weights <- is.null(characteristics)
     n.questions.left.out <- tasks.left.out # we now refer to tasks as questions
@@ -78,12 +74,8 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     }
     else if (is.null(characteristics))
     {
-        if (!is.mixture.of.normals)
-            result <- latentClassMaxDiff(dat, dat$respondent.indices, NULL, n.classes, seed,
-                                         initial.parameters, 0, trace, TRUE, lc.tolerance, is.tricked)
-        else
-            result <- mixtureOfNormalsMaxDiff(dat, n.classes, normal.covariance, seed, initial.parameters,
-                                               trace, pool.variance, n.draws, is.tricked)
+        result <- latentClassMaxDiff(dat, dat$respondent.indices, NULL, n.classes, seed,
+                                     initial.parameters, 0, trace, TRUE, lc.tolerance, is.tricked)
     }
     else
         result <- varyingCoefficientsMaxDiff(dat, n.classes, seed, initial.parameters, trace, apply.weights,
@@ -107,7 +99,6 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
 
     resp.pars <- as.matrix(RespondentParameters(result))[dat$subset, ]
     result$respondent.probabilities <- exp(resp.pars) / rowSums(exp(resp.pars))
-    result$is.mixture.of.normals <- is.mixture.of.normals
     result$algorithm <- algorithm
     result
 }
@@ -197,8 +188,6 @@ print.FitMaxDiff <- function(x, ...)
     has.covariates <- !is.null(x$covariates.notes)
     title <- if (has.covariates)
         "MaxDiff: Varying Coefficients"
-    else if (!is.null(x$is.mixture.of.normals) && x$is.mixture.of.normals)
-        "MaxDiff: Mixture of Normals"
     else if (is.hb)
         "MaxDiff: Hierarchical Bayes"
     else
@@ -222,15 +211,8 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "BIC: ", FormatAsReal(x$bic, decimals = 2), "; ")
     }
 
-    footer <- if (!is.hb && !x$lc && !x$is.mixture.of.normals)
+    footer <- if (!is.hb && !x$lc)
         paste0(footer, "Latent class analysis over respondents not applied; ")
-    else if (!is.null(x$is.mixture.of.normals) && x$is.mixture.of.normals)
-    {
-        if (x$n.classes == 1)
-            paste0(footer, "Mixture of normals: ", x$n.classes, " class; ")
-        else
-            paste0(footer, "Mixture of normals: ", x$n.classes, " classes; ")
-    }
     else if (is.hb)
         footer
     else
@@ -259,8 +241,7 @@ print.FitMaxDiff <- function(x, ...)
     else
         x$output
 
-    if (x$n.classes == 1 && !has.covariates
-        && ((!is.hb && !x$is.mixture.of.normals) || output == "Classes"))
+    if (x$n.classes == 1 && !has.covariates && (!is.hb || output == "Classes"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
