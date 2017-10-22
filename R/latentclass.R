@@ -280,3 +280,36 @@ computeBoost <- function(resp.pars, X, n.respondents, n.questions, n.choices)
     }
     result
 }
+
+numberOfParameters <- function(n.beta, n.classes, is.mixture.of.normals = FALSE, normal.covariance = NULL,
+                               pool.variance = FALSE)
+{
+    result <- n.beta * n.classes + n.classes - 1
+    if (is.mixture.of.normals)
+    {
+        if (normal.covariance == "Spherical")
+        {
+            if (pool.variance)
+                result <- result + 1
+            else
+                result <- result + n.classes
+        }
+        else if (normal.covariance == "Diagonal")
+        {
+            if (pool.variance)
+                result <- result + n.beta
+            else
+                result <- result + n.beta * n.classes
+        }
+        else if (normal.covariance == "Full")
+        {
+            if (pool.variance)
+                result <- result + 0.5 * n.beta * (n.beta + 1)
+            else
+                result <- result + 0.5 * n.beta * (n.beta + 1) * n.classes
+        }
+        else
+            stop(paste("Distribution not handled:", normal.covariance))
+    }
+    result
+}
