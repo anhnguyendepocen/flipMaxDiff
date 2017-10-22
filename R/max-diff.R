@@ -26,7 +26,6 @@
 #'  parameters are ignored.
 #' @param normal.covariance The form of the covariance matrix for Hierarchical Bayes.
 #' Can be 'Full, 'Spherical', 'Diagonal'.
-#' @param pool.variance Whether to pool parameter covariances between classes in mixture of normals.
 #' @param lc.tolerance The tolerance used for defining convergence in latent class analysis.
 #' @param is.tricked Whether to use tricked logit instead of rank-ordered logit with ties.
 #' @param hb.iterations The number of iterations in Hierarchical Bayes.
@@ -40,7 +39,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
                        initial.parameters = NULL, trace = 0, sub.model.outputs = FALSE, lc = TRUE,
                        output = "Default", tasks.left.out = 0,
-                       algorithm = "Default", normal.covariance = "Full", pool.variance = FALSE,
+                       algorithm = "Default", normal.covariance = "Full",
                        lc.tolerance = 0.0001, is.tricked = TRUE,
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
                        hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE)
@@ -66,7 +65,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
                                            hb.adapt.delta, is.tricked, seed, hb.keep.samples,
-                                           n.classes, hb.stanfit)
+                                           n.classes, hb.stanfit, normal.covariance)
     }
     else if (algorithm == "HB-bayesm")
     {

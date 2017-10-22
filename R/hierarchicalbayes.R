@@ -2,12 +2,13 @@
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
-                                     keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE)
+                                     keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE,
+                                     normal.covariance)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
 
-    stan.dat <- createStanData(dat, n.classes, is.tricked)
+    stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance)
 
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
@@ -27,7 +28,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     else # windows
     {
         rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
-        stan.file <- if (n.classes > 1) "exec/mixtureofnormals.stan" else "exec/hb.stan"
+        stan.file <- stanFileName(n.classes, normal.covariance)
         stan.fit <- stan(file = stan.file, data = stan.dat, iter = n.iterations,
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
@@ -44,7 +45,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     result
 }
 
-createStanData <- function(dat, n.classes, is.tricked)
+createStanData <- function(dat, n.classes, is.tricked, normal.covariance)
 {
     n.choices <- ncol(dat$X.in)
     n.alternatives <- dat$n.alternatives
@@ -78,5 +79,28 @@ createStanData <- function(dat, n.classes, is.tricked)
     if (n.classes > 1)
         stan.dat$P <- n.classes
 
+    if (normal.covariance == "Diagonal")
+        stan.dat$U <- n.alternatives
+    else if (normal.covariance == "Spherical")
+        stan.dat$U <- 1
+
     stan.dat
+}
+
+stanFileName <- function(n.classes, normal.covariance)
+{
+    if (n.classes == 1)
+    {
+        if (normal.covariance == "Full")
+            "exec/hb.stan"
+        else
+            "exec/diagonal.stan"
+    }
+    else
+    {
+        if (normal.covariance == "Full")
+            "exec/mixtureofnormals.stan"
+        else
+            "exec/diagonalmixture.stan"
+    }
 }
