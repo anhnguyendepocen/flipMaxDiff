@@ -21,7 +21,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
         # devtools::use_data(mod, internal = TRUE, overwrite = TRUE)
         # where model.code is the stan code as a string.
         # Ideally we would want to recompile when the package is built (similar to Rcpp)
-        m <- if (n.classes > 1) mod.mix else mod
+        m <- stanModel(n.classes, normal.covariance)
         stan.fit <- sampling(m, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
                              control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
@@ -102,5 +102,23 @@ stanFileName <- function(n.classes, normal.covariance)
             "exec/mixtureofnormals.stan"
         else
             "exec/diagonalmixture.stan"
+    }
+}
+
+stanModel <- function(n.classes, normal.covariance)
+{
+    if (n.classes == 1)
+    {
+        if (normal.covariance == "Full")
+            mod
+        else
+            mod.diag
+    }
+    else
+    {
+        if (normal.covariance == "Full")
+            mod.mix
+        else
+            mod.mix.diag
     }
 }
