@@ -3,7 +3,7 @@
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE,
-                                     normal.covariance)
+                                     normal.covariance = "Full")
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
