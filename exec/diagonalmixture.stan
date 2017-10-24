@@ -105,7 +105,7 @@ transformed data {
 
 parameters {
     vector[K - 1] theta_raw[P];
-    vector<lower=0, upper=pi()/2>[K] sigma_unif[U];
+    vector<lower=0, upper=pi()/2>[U] sigma_unif[P];
     vector[K] standard_normal[R, P];
     simplex[P] class_weights;
 }
