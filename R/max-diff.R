@@ -34,6 +34,7 @@
 #' @param hb.adapt.delta http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
 #' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
 #' @param hb.stanfit Whether to include the stanfit property.
+#' @param hb.unit.test Flag for unit test
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
@@ -42,7 +43,8 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        algorithm = "Default", normal.covariance = "Full",
                        lc.tolerance = 0.0001, is.tricked = TRUE,
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
-                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE)
+                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE,
+                       hb.unit.test = FALSE)
 {
     # For backwards compatibility
     if (algorithm == "HB")
@@ -65,7 +67,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
     {
         result <- hierarchicalBayesMaxDiff(dat, hb.iterations, hb.chains, hb.max.tree.depth,
                                            hb.adapt.delta, is.tricked, seed, hb.keep.samples,
-                                           n.classes, hb.stanfit, normal.covariance)
+                                           n.classes, hb.stanfit, normal.covariance, hb.unit.test)
     }
     else if (algorithm == "HB-bayesm")
     {
