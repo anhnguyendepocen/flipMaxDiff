@@ -3,7 +3,7 @@
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
                                      adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE,
-                                     normal.covariance = "Full", is.unit.test = FALSE)
+                                     normal.covariance = "Full")
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
@@ -13,13 +13,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
 
-    if (is.unit.test)
-    {
-        stan.fit <- stan(model_code = modelCode(), data = stan.dat, iter = n.iterations,
-                         chains = n.chains, seed = seed,
-                         control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
-    }
-    else if (.Platform$OS.type == "unix")
+    if (.Platform$OS.type == "unix")
     {
         # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
         # The R code used to generate mod on a linux machine is:
@@ -98,16 +92,16 @@ stanFileName <- function(n.classes, normal.covariance)
     if (n.classes == 1)
     {
         if (normal.covariance == "Full")
-            "exec/hb.stan"
+            "tests/testthat/exec/hb.stan"
         else
-            "exec/diagonal.stan"
+            "tests/testthat/exec/diagonal.stan"
     }
     else
     {
         if (normal.covariance == "Full")
-            "exec/mixtureofnormals.stan"
+            "tests/testthat/exec/mixtureofnormals.stan"
         else
-            "exec/diagonalmixture.stan"
+            "tests/testthat/exec/diagonalmixture.stan"
     }
 }
 
