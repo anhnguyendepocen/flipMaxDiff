@@ -9,21 +9,23 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: AlgDesign,
-         MASS,
+         bayesm,
+         flipChoice,
          flipData,
          flipFormat,
          flipTransformations,
-         flipChoice,
+         flipU (>= 1.0.2),
+         MASS,
          Rcpp (>= 0.12.10),
          rstan,
-         bayesm,
          utils
-Suggests: testthat,
-         foreign
+Suggests: foreign,
+         testthat,
 LinkingTo: Rcpp
-Remotes: Displayr/flipData,
+Remotes: Displayr/flipChoice,
+         Displayr/flipData,
          Displayr/flipFormat,
          Displayr/flipTransformations,
-         Displayr/flipChoice
+         Displayr/flipU
 RoxygenNote: 6.0.1
 Depends: R(>= 2.10.0)

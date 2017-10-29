@@ -65,7 +65,7 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, n.questio
 }
 
 #' @importFrom flipData CalibrateWeight CleanSubset CleanWeights
-#' @importFrom flipFormat TrimWhitespace
+#' @importFrom flipU TrimWhitespace
 cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.names, subset = NULL, weights = NULL,
                               characteristics = NULL, seed, n.questions.left.out = 0)
 {
