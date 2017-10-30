@@ -85,7 +85,7 @@ createStanData <- function(dat, n.classes, is.tricked, normal.covariance, hb.pri
         stan.dat$U <- 1
 
     if (is.null(hb.prior.sd))
-        stan.dat$prior_sd <- rep(2, n.alternatives) # default prior mean parameter SD
+        stan.dat$prior_sd <- rep(2, n.alternatives - 1) # default prior mean parameter SD
     else if (!is.numeric(hb.prior.sd) || length(hb.prior.sd) != n.alternatives - 1)
         stop("The supplied parameter hb.prior.sd is inappropriate.")
     else
