@@ -160,7 +160,7 @@ model {
     for (p in 1:P)
     {
         for (k in 1:(K - 1))
-            theta_raw[p] ~ normal(0, prior_sd[k]);
+            theta_raw[p, k] ~ normal(0, prior_sd[k]);
         for (r in 1:R)
             standard_normal[r, p] ~ normal(0, 1);
     }
