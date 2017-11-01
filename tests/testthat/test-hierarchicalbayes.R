@@ -95,13 +95,3 @@ test_that("HB spherical", {
     expect_error(print(result), NA)
     # expect_equal(result$in.sample.accuracy, 0.934878587196468)
 })
-
-test_that("HB prior sd", {
-    result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
-                         best = best, worst = worst,
-                         alternative.names = names, algorithm = "HB",
-                         hb.iterations = 10, hb.chains = 1,
-                         hb.prior.sd = rep(2, 9), hb.warnings = FALSE)
-    expect_error(print(result), NA)
-    # expect_equal(result$in.sample.accuracy, 0.936534216335541)
-})
