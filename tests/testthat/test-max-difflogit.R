@@ -51,12 +51,12 @@ test_that("Estimating logit parameters", {
     # Cross validation
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                          best = best, worst = worst, alternative.names = names,
-                         tasks.left.out = 2, is.tricked = FALSE)
+                         tasks.left.out = 2, is.tricked = TRUE)
     expect_error(print(result), NA)
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                          best = best, worst = worst, subset = sub,
                          weights = wgt, alternative.names = names,
-                         tasks.left.out = 2, is.tricked = FALSE)
+                         tasks.left.out = 2, is.tricked = TRUE)
     expect_error(print(result), NA)
 })
 
@@ -116,17 +116,17 @@ test_that("Latent class", {
                                   alternative.names = names,
                                   n.classes = 2,
                                   output = "Classes"),
-                                  is.tricked = FALSE), NA)
+                                  is.tricked = TRUE), NA)
 
     # Cross validation
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                          best = best, worst = worst, alternative.names = names,
-                         n.classes = 2, tasks.left.out = 3, is.tricked = FALSE)
+                         n.classes = 2, tasks.left.out = 3, is.tricked = TRUE)
     expect_error(print(result), NA)
     result <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                          best = best, worst = worst, alternative.names = names,
                          n.classes = 2, weight = wgt, subset = sub,
-                         tasks.left.out = 3, is.tricked = FALSE)
+                         tasks.left.out = 3, is.tricked = TRUE)
     expect_error(print(result), NA)
 })
 
@@ -136,34 +136,34 @@ test_that("Checking some of the inputs", {
                             version = rep(1, nrow(best)),
                             best = best, worst = worst,
                             alternative.names = names,
-                            is.tricked = FALSE), NA)
+                            is.tricked = TRUE), NA)
     # No Task column in design
     expect_error(FitMaxDiff(design = tech.design[, -2],
                             version = rep(1, nrow(best)),
                             best = best, worst = worst,
                             alternative.names = names,
-                            is.tricked = FALSE), NA)
+                            is.tricked = TRUE), NA)
     # Neither version nor Task column in design
     expect_error(FitMaxDiff(design = tech.design[, -1:-2],
                             version = rep(1, nrow(best)),
                             best = best, worst = worst,
                             alternative.names = names,
-                            is.tricked = FALSE), NA)
+                            is.tricked = TRUE), NA)
     # No version
     expect_error(FitMaxDiff(design = tech.design[, -1:-2],
                             best = best, worst = worst,
                             alternative.names = names,
-                            is.tricked = FALSE), NA)
+                            is.tricked = TRUE), NA)
     # inconsistent version information
     expect_error(FitMaxDiff(design = tech.design[, -1:-2],
                             version = 1:nrow(best),
                             best = best, worst = worst,
                             alternative.names = names,
-                            is.tricked = FALSE))
+                            is.tricked = TRUE))
     des <- tech.design
     des$Version <- 3
     expect_error(FitMaxDiff(design = des, best = best, worst = worst,
-                            alternative.names = names, is.tricked = FALSE))
+                            alternative.names = names, is.tricked = TRUE))
     # No names
     expect_error(FitMaxDiff(design = tech.design, best = best, worst = worst))
     # Incorrect names as a string
@@ -171,11 +171,11 @@ test_that("Checking some of the inputs", {
     expect_error(suppressWarnings(FitMaxDiff(design = tech.design,
                                              best = best, worst = worst,
                                              alternative.names = alt.names,
-                                             is.tricked = FALSE)))
+                                             is.tricked = TRUE)))
     # Correct names as a string
     nms = paste(names, collapse = ", ")
     expect_error(FitMaxDiff(design = tech.design, best = best, worst = worst,
-                            alternative.names = nms, is.tricked = FALSE), NA)
+                            alternative.names = nms, is.tricked = TRUE), NA)
 })
 
 test_that("Varying coefficients", {
@@ -186,21 +186,21 @@ test_that("Varying coefficients", {
                                alternative.names = names,
                                characteristics = NULL,
                                n.classes = 1,
-                               is.tricked = FALSE)$log.likelihood
+                               is.tricked = TRUE)$log.likelihood
     # Gender varying coefficient
     expect_error(FitMaxDiff(design = tech.design,
                             version = rep(1, nrow(best)),
                             best = best, worst = worst,
                             alternative.names = names,
                             characteristics = data.frame(tech.data$Q1),
-                            n.classes = 1, lc = FALSE, is.tricked = FALSE))
+                            n.classes = 1, lc = FALSE, is.tricked = TRUE))
     # Apple varying coefficient
     ll.apple <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                            best = best, worst = worst,
                            alternative.names = names,
                            characteristics = data.frame(tech.data$Q3_01),
                            n.classes = 1, lc = FALSE,
-                           is.tricked = FALSE)$log.likelihood
+                           is.tricked = TRUE)$log.likelihood
     expect_true(ll.apple > ll.aggregate)
     # Apple varying coefficient with boosting
     d <- data.frame(tech.data$Q3_01)
@@ -210,13 +210,13 @@ test_that("Varying coefficients", {
                                               alternative.names = names,
                                               characteristics = d,
                                               n.classes = 5,
-                                              is.tricked = FALSE)$log.likelihood
+                                              is.tricked = TRUE)$log.likelihood
     ll.5.classes <- FitMaxDiff(design = tech.design,
                                version = rep(1, nrow(best)),
                                best = best, worst = worst,
                                alternative.names = names,
                                n.classes = 5,
-                               is.tricked = FALSE)$log.likelihood
+                               is.tricked = TRUE)$log.likelihood
     expect_true(ll.apple.boosting.5.classes > ll.5.classes)
 
     d <- data.frame(tech.data$Q3_01)
@@ -226,7 +226,7 @@ test_that("Varying coefficients", {
                                             alternative.names = names,
                                             characteristics = d,
                                             n.classes = 1,
-                                            is.tricked = FALSE)$log.likelihood
+                                            is.tricked = TRUE)$log.likelihood
     expect_true(ll.apple.boosting.1.class > ll.apple)
     expect_true(ll.apple.boosting.1.class > ll.aggregate)
 
@@ -238,7 +238,7 @@ test_that("Varying coefficients", {
                                          alternative.names = names,
                                          characteristics = d,
                                          n.classes = 2, tasks.left.out = 1,
-                                         is.tricked = FALSE)
+                                         is.tricked = TRUE)
     expect_error(print(apple.boosting.2.class), NA)
 
     #Subset
@@ -247,7 +247,7 @@ test_that("Varying coefficients", {
                          best = best, worst = worst, alternative.names = names,
                          characteristics = data.frame(tech.data$Q3_01),
                          n.classes = 2, tasks.left.out = 4, subset = sub,
-                         is.tricked = FALSE)
+                         is.tricked = TRUE)
     expect_error(print(result), NA)
 })
 
@@ -257,7 +257,7 @@ test_that("Saving variables", {
     # Posterior probabilities.
     lc.3 <- FitMaxDiff(design = tech.design, version = rep(1, nrow(best)),
                        best = best, worst = worst, alternative.names = names,
-                       n.classes = 3, subset = sub, is.tricked = FALSE)
+                       n.classes = 3, subset = sub, is.tricked = TRUE)
     pp <- lc.3$posterior.probabilities[sub, ]
     expect_equal(ncol(pp), 3)
     expect_equal(sd(apply(pp, 1, sum)), 0)
@@ -290,7 +290,7 @@ test_that("Experimental designs with versions", {
     expect_error(suppressWarnings(FitMaxDiff(design = des, dat$MDversion,
                                              best = best, worst = worst,
                                              alternative.names = names,
-                                             is.tricked = FALSE)))
+                                             is.tricked = TRUE)))
     names <- c("Decent/ethical", "Plain-speaking", "Healthy",
                "Successful in business", "Good in a crisis",
                "Experienced in government",
@@ -301,10 +301,10 @@ test_that("Experimental designs with versions", {
                "From a traditional American background", "Christian")
     expect_error(FitMaxDiff(design = des, dat$MDversion, best = best,
                             worst = worst, alternative.names = names,
-                            is.tricked = FALSE), NA)
+                            is.tricked = TRUE), NA)
     expect_error(FitMaxDiff(design = des, dat$MDversion, best = best,
                             worst = worst, alternative.names = names,
-                            n.classes = 3, is.tricked = FALSE), NA)
+                            n.classes = 3, is.tricked = TRUE), NA)
     # Example from Q wiki
     # dat <- suppressWarnings(foreign::read.spss("http://wiki.q-researchsoftware.com/images/6/66/MaxDiffSetupExample.sav", to.data.frame = TRUE))
     # des <- read.csv("http://wiki.q-researchsoftware.com/images/2/24/ExampleMaxDiffDesign.csv")
@@ -313,24 +313,4 @@ test_that("Experimental designs with versions", {
     # names <- paste("Brand", 1:13)
     # expect_error(FitMaxDiff(design = des, dat$MDversion, best = best, worst = worst, alternative.names = names))
 
-})
-
-test_that("Tricked logit", {
-    # Aggregate
-    expect_error(print(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, is.tricked = TRUE)), NA)
-
-    # Weighted
-    wgt <- tech.data$RESPNUM
-    expect_error(print(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                                  alternative.names = names, is.tricked = TRUE, weights = wgt)), NA)
-
-    # Latent class analysis
-    expect_error(print(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                         alternative.names = names, is.tricked = TRUE, n.classes = 2)), NA)
-
-    # Varying coefficients
-    expect_error(print(FitMaxDiff(design = tech.design, version = rep(1, nrow(best)), best = best, worst = worst,
-                           alternative.names = names, characteristics = data.frame(tech.data$Q3_01),
-                           n.classes = 2, is.tricked = TRUE)), NA)
 })
