@@ -95,7 +95,6 @@ data {
     int<lower=1,upper=C> YW[R, S]; // worst choices
     matrix[C, K] X[R, S]; // matrix of attributes for each obs
     int logit_type; // 1: tricked logit, 2: rank-ordered logit
-    vector[K - 1] prior_sd; // Prior sd for theta_raw
 }
 
 transformed data {
@@ -133,8 +132,7 @@ transformed parameters {
 
 model {
     //priors
-    for (k in 1:(K - 1))
-        theta_raw[k] ~ normal(0, prior_sd[k]);
+    theta_raw ~ normal(0, 10);
 
     L_omega ~ lkj_corr_cholesky(4);
 

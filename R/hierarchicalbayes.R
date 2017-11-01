@@ -6,7 +6,6 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      keep.samples = FALSE, n.classes = 1,
                                      include.stanfit = TRUE,
                                      normal.covariance = "Full",
-                                     prior.sd = NULL,
                                      stan.warnings = TRUE)
 {
     # We want to replace this call with a proper integration of rstan into this package
@@ -15,7 +14,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
 
-    stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance, prior.sd)
+    stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance)
 
     if (stan.warnings)
         stan.fit <- runStanSampling(stan.dat, n.classes, n.iterations,
@@ -65,7 +64,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
     }
 }
 
-createStanData <- function(dat, n.classes, is.tricked, normal.covariance, prior.sd)
+createStanData <- function(dat, n.classes, is.tricked, normal.covariance)
 {
     n.choices <- ncol(dat$X.in)
     n.alternatives <- dat$n.alternatives
@@ -103,13 +102,6 @@ createStanData <- function(dat, n.classes, is.tricked, normal.covariance, prior.
         stan.dat$U <- n.alternatives
     else if (normal.covariance == "Spherical")
         stan.dat$U <- 1
-
-    if (is.null(prior.sd))
-        stan.dat$prior_sd <- rep(2, n.alternatives - 1) # default prior mean parameter SD
-    else if (!is.numeric(prior.sd) || length(prior.sd) != n.alternatives - 1)
-        stop("The supplied parameter hb.prior.sd is inappropriate.")
-    else
-        stan.dat$prior_sd <- prior.sd
 
     stan.dat
 }
