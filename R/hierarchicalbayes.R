@@ -42,10 +42,10 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                             normal.covariance, max.tree.depth, adapt.delta,
                             seed)
 {
-    if (.Platform$OS.type == "unix")
+    if (Sys.info()[["nodename"]] %in% c("reusdev", "reustest", "reusprod")) # R servers
     {
         # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
-        # The R code used to generate mod on a linux machine is:
+        # The R code used to generate mod is:
         # mod <- rstan::stan_model(model_code = model.code)
         # devtools::use_data(mod, internal = TRUE, overwrite = TRUE)
         # where model.code is the stan code as a string.
@@ -54,7 +54,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
         stan.fit <- sampling(m, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
                              control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
-    else # windows
+    else # Not R servers
     {
         rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
         stan.file <- stanFileName(n.classes, normal.covariance)
