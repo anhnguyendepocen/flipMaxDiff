@@ -1,18 +1,48 @@
 #' @importFrom rstan rstan_options stan extract sampling
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars
-hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.tree.depth = 10,
-                                     adapt.delta = 0.8, is.tricked = TRUE, seed = 123,
-                                     keep.samples = FALSE, n.classes = 1, include.stanfit = TRUE,
-                                     normal.covariance = "Full", hb.prior.sd = NULL)
+hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
+                                     max.tree.depth = 10, adapt.delta = 0.8,
+                                     is.tricked = TRUE, seed = 123,
+                                     keep.samples = FALSE, n.classes = 1,
+                                     include.stanfit = TRUE,
+                                     normal.covariance = "Full",
+                                     prior.sd = NULL,
+                                     stan.warnings = TRUE)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
 
-    stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance, hb.prior.sd)
-
     # allows Stan chains to run in parallel on multiprocessor machines
     options(mc.cores = parallel::detectCores())
 
+    stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance, prior.sd)
+
+    if (stan.warnings)
+        stan.fit <- runStanSampling(stan.dat, n.classes, n.iterations,
+                                    n.chains, normal.covariance,
+                                    max.tree.depth, adapt.delta, seed)
+    else
+        suppressWarnings(stan.fit <- runStanSampling(stan.dat, n.classes,
+                                                     n.iterations, n.chains,
+                                                     normal.covariance,
+                                                     max.tree.depth,
+                                                     adapt.delta, seed))
+
+    result <- list()
+    result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
+    if (include.stanfit)
+    {
+        result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
+        result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
+    }
+    class(result) <- "FitMaxDiff"
+    result
+}
+
+runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
+                            normal.covariance, max.tree.depth, adapt.delta,
+                            seed)
+{
     if (.Platform$OS.type == "unix")
     {
         # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
@@ -33,19 +63,9 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8, max.
                          chains = n.chains, seed = seed,
                          control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
     }
-
-    result <- list()
-    result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
-    if (include.stanfit)
-    {
-        result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
-        result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
-    }
-    class(result) <- "FitMaxDiff"
-    result
 }
 
-createStanData <- function(dat, n.classes, is.tricked, normal.covariance, hb.prior.sd)
+createStanData <- function(dat, n.classes, is.tricked, normal.covariance, prior.sd)
 {
     n.choices <- ncol(dat$X.in)
     n.alternatives <- dat$n.alternatives
@@ -84,12 +104,12 @@ createStanData <- function(dat, n.classes, is.tricked, normal.covariance, hb.pri
     else if (normal.covariance == "Spherical")
         stan.dat$U <- 1
 
-    if (is.null(hb.prior.sd))
+    if (is.null(prior.sd))
         stan.dat$prior_sd <- rep(2, n.alternatives - 1) # default prior mean parameter SD
-    else if (!is.numeric(hb.prior.sd) || length(hb.prior.sd) != n.alternatives - 1)
+    else if (!is.numeric(prior.sd) || length(prior.sd) != n.alternatives - 1)
         stop("The supplied parameter hb.prior.sd is inappropriate.")
     else
-        stan.dat$prior_sd <- hb.prior.sd
+        stan.dat$prior_sd <- prior.sd
 
     stan.dat
 }

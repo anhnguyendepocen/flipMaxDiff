@@ -11,7 +11,8 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   tasks.left.out = 0, algorithm = "Default", normal.covariance = "Full",
   lc.tolerance = 1e-04, is.tricked = TRUE, hb.iterations = 500,
   hb.chains = 8, hb.max.tree.depth = 10, hb.adapt.delta = 0.8,
-  hb.keep.samples = FALSE, hb.stanfit = TRUE, hb.prior.sd = NULL)
+  hb.keep.samples = FALSE, hb.stanfit = TRUE, hb.prior.sd = NULL,
+  hb.warnings = TRUE)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
@@ -76,6 +77,8 @@ Can be 'Full, 'Spherical', 'Diagonal'.}
 
 \item{hb.prior.sd}{The standard deviations for the priors of the mean parameters theta_raw.
 These parameters correspond the alternatives (excluding the first alternative).}
+
+\item{hb.warnings}{Whether to show warnings from Stan.}
 }
 \description{
 Fits a latent class rank-ordered logit model with ties to a max-diff experiment.
