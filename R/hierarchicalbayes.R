@@ -1,5 +1,6 @@
 #' @importFrom rstan rstan_options stan extract sampling
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars ExtractBetaDraws
+#'  IsRServer
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      max.tree.depth = 10, adapt.delta = 0.8,
                                      is.tricked = TRUE, seed = 123,
@@ -43,7 +44,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                             normal.covariance, max.tree.depth, adapt.delta,
                             seed)
 {
-    if (Sys.info()[["nodename"]] %in% c("reusdev", "reustest", "reusprod")) # R servers
+    if (IsRServer()) # R servers
     {
         # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
         # The R code used to generate mod is:
