@@ -35,6 +35,7 @@
 #' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
 #' @param hb.stanfit Whether to include the stanfit property.
 #' @param hb.warnings Whether to show warnings from Stan.
+#' @param hb.max.draws Maximum number of beta draws per respondent.
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
@@ -44,7 +45,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n
                        lc.tolerance = 0.0001, is.tricked = TRUE,
                        hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
                        hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE,
-                       hb.warnings = TRUE)
+                       hb.warnings = TRUE, hb.max.draws = 100)
 {
     # For backwards compatibility
     if (algorithm == "HB")

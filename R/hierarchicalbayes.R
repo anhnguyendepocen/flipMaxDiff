@@ -1,12 +1,13 @@
 #' @importFrom rstan rstan_options stan extract sampling
-#' @importFrom flipChoice ReduceStanFitSize ComputeRespPars
+#' @importFrom flipChoice ReduceStanFitSize ComputeRespPars ExtractBetaDraws
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      max.tree.depth = 10, adapt.delta = 0.8,
                                      is.tricked = TRUE, seed = 123,
                                      keep.samples = FALSE, n.classes = 1,
                                      include.stanfit = TRUE,
                                      normal.covariance = "Full",
-                                     stan.warnings = TRUE)
+                                     stan.warnings = TRUE,
+                                     max.draws = 100)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
@@ -32,7 +33,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
     if (include.stanfit)
     {
         result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
-        result$beta.draws <- extract(stan.fit, pars=c("beta"))$beta
+        result$beta.draws <- ExtractBetaDraws(stan.fit, max.draws)
     }
     class(result) <- "FitMaxDiff"
     result
