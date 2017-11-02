@@ -30,6 +30,11 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
         ll <- logLikelihood(p, X, boost, weights, ind.levels, n.classes, n.beta, n.questions,
                             apply.weights, is.tricked)
         # print(ll)
+        # if (is.na(ll))
+        # {
+        #     print("ll is NaN")
+        # }
+
         if (ll - previous.ll < tol)
             break
         else
@@ -126,7 +131,10 @@ inferParameters <- function(class.memberships, X, boost, weights, ind.levels, n.
         if (!is.null(weights))
             class.weights <- class.weights * weights
         solution <- optimizeMaxDiff(X, boost, class.weights, n.beta, trace, is.tricked)
-        res[((c - 1) * n.beta + 1):(c * n.beta)] <- solution$par
+        p <- solution$par
+        p[p > 100] = 100
+        p[p < -100] = -100
+        res[((c - 1) * n.beta + 1):(c * n.beta)] <- p
     }
 
     # Class size parameters

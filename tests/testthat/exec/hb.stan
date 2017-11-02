@@ -132,7 +132,7 @@ transformed parameters {
 
 model {
     //priors
-    theta_raw ~ normal(0, 10);
+    theta_raw ~ normal(0, 5);
 
     L_omega ~ lkj_corr_cholesky(4);
 

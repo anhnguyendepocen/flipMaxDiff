@@ -137,7 +137,7 @@ transformed parameters {
 
 model {
     //priors
-    theta_raw ~ normal(0, 10);
+    theta_raw ~ normal(0, 5);
 
     for (r in 1:R)
         standard_normal[r] ~ normal(0, 1);
