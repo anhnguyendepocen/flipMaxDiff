@@ -35,7 +35,8 @@
 #' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
 #' @param hb.stanfit Whether to include the stanfit property.
 #' @param hb.warnings Whether to show warnings from Stan.
-#' @param hb.max.draws Maximum number of beta draws per respondent.
+#' @param hb.max.draws Maximum number of beta draws per respondent to return in
+#' beta.draws.
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
                        subset = NULL, weights = NULL, characteristics = NULL, seed = 123,

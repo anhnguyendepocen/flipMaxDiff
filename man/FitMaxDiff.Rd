@@ -77,7 +77,8 @@ Can be 'Full, 'Spherical', 'Diagonal'.}
 
 \item{hb.warnings}{Whether to show warnings from Stan.}
 
-\item{hb.max.draws}{Maximum number of beta draws per respondent.}
+\item{hb.max.draws}{Maximum number of beta draws per respondent to return in
+beta.draws.}
 }
 \description{
 Fits a latent class rank-ordered logit model with ties to a max-diff experiment.
