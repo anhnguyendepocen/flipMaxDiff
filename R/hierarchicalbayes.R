@@ -53,16 +53,22 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
         # where model.code is the stan code as a string.
         # Ideally we would want to recompile when the package is built (similar to Rcpp)
         m <- stanModel(n.classes, normal.covariance)
-        stan.fit <- sampling(m, data = stan.dat, chains = n.chains, iter = n.iterations, seed = seed,
-                             control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
+        stan.fit <- sampling(m, data = stan.dat, chains = n.chains,
+                             iter = n.iterations, seed = seed,
+                             pars = c("theta", "sigma", "beta"),
+                             control = list(max_treedepth = max.tree.depth,
+                                            adapt_delta = adapt.delta))
     }
     else # Not R servers
     {
         rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
         stan.file <- stanFileName(n.classes, normal.covariance)
-        stan.fit <- stan(file = stan.file, data = stan.dat, iter = n.iterations,
+        stan.fit <- stan(file = stan.file, data = stan.dat,
+                         iter = n.iterations,
                          chains = n.chains, seed = seed,
-                         control = list(max_treedepth = max.tree.depth, adapt_delta = adapt.delta))
+                         pars = c("theta", "sigma", "beta"),
+                         control = list(max_treedepth = max.tree.depth,
+                                        adapt_delta = adapt.delta))
     }
 }
 
