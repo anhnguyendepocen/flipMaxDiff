@@ -44,6 +44,10 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                             normal.covariance, max.tree.depth, adapt.delta,
                             seed)
 {
+    pars <- c("theta", "sigma", "beta")
+    if (n.classes > 1)
+        pars <- c(pars, "posterior_prob")
+
     if (IsRServer()) # R servers
     {
         # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
@@ -55,7 +59,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
         m <- stanModel(n.classes, normal.covariance)
         stan.fit <- sampling(m, data = stan.dat, chains = n.chains,
                              iter = n.iterations, seed = seed,
-                             pars = c("theta", "sigma", "beta"),
+                             pars = pars,
                              control = list(max_treedepth = max.tree.depth,
                                             adapt_delta = adapt.delta))
     }
@@ -66,7 +70,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
         stan.fit <- stan(file = stan.file, data = stan.dat,
                          iter = n.iterations,
                          chains = n.chains, seed = seed,
-                         pars = c("theta", "sigma", "beta"),
+                         pars = pars,
                          control = list(max_treedepth = max.tree.depth,
                                         adapt_delta = adapt.delta))
     }
