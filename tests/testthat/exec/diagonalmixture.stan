@@ -169,14 +169,14 @@ model {
 }
 
 generated quantities {
-    vector[V] beta[R];
+    vector[K] beta[R];
     for (r in 1:R)
-        for (v in 1:V)
+        for (k in 1:K)
         {
             vector[P] pp = exp(posterior_prob[r]);
             pp = pp / sum(pp);
-            beta[r, v] = 0;
+            beta[r, k] = 0;
             for (p in 1:P)
-                beta[r, v] = beta[r, v] + class_beta[r, p, v] * pp[p];
+                beta[r, k] = beta[r, k] + class_beta[r, p, k] * pp[p];
         }
 }
