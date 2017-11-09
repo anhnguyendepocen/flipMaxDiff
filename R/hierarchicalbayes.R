@@ -45,8 +45,6 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                             seed)
 {
     pars <- c("theta", "sigma", "beta")
-    if (n.classes > 1)
-        pars <- c(pars, "posterior_prob")
 
     if (IsRServer()) # R servers
     {

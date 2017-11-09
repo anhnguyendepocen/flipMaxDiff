@@ -114,7 +114,7 @@ transformed parameters {
     vector<lower=0>[K] sigma[P];
     matrix[K, K] L_sigma[P];
     vector[K] theta[P]; // sums to zero
-    vector[K] beta[R, P];
+    vector[K] class_beta[R, P];
     vector[P] posterior_prob[R];
 
     for (p in 1:P)
@@ -127,7 +127,7 @@ transformed parameters {
             theta[p, k + 1] = theta_raw[p, k];
 
         for (r in 1:R)
-            beta[r, p] = theta[p] + L_sigma[p] * standard_normal[r, p];
+            class_beta[r, p] = theta[p] + L_sigma[p] * standard_normal[r, p];
     }
 
     for (r in 1:R)
@@ -141,9 +141,9 @@ transformed parameters {
                 Y[1] = YB[r, s];
                 Y[2] = YW[r, s];
                 if (logit_type == 1)
-                    prob = prob + tricked_logit_lpmf(Y | X[r, s] * beta[r, p]);
+                    prob = prob + tricked_logit_lpmf(Y | X[r, s] * class_beta[r, p]);
                 else
-                    prob = prob + rank_ordered_logit_lpmf(Y | X[r, s] * beta[r, p], combinations);
+                    prob = prob + rank_ordered_logit_lpmf(Y | X[r, s] * class_beta[r, p], combinations);
             }
             posterior_prob[r, p] = prob;
         }
@@ -162,4 +162,17 @@ model {
     //likelihood
     for (r in 1:R)
         target += log_sum_exp(posterior_prob[r]);
+}
+
+generated quantities {
+    vector[K] beta[R];
+    for (r in 1:R)
+        for (k in 1:K)
+        {
+            vector[P] pp = exp(posterior_prob[r]);
+            pp = pp / sum(pp);
+            beta[r, k] = 0;
+            for (p in 1:P)
+                beta[r, k] = beta[r, k] + class_beta[r, p, k] * pp[p];
+        }
 }
