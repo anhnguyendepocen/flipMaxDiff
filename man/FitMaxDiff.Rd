@@ -49,7 +49,7 @@ no outputs, and 6 is the most detailed outputs.}
 
 \item{lc}{Whether to run latent class step at the end if characteristics are supplied.}
 
-\item{output}{Output type. Can be "Default", "Probabilities" or "Classes".}
+\item{output}{Output type. Can be "Default", "Parameters", "Probabilities" or "Classes".}
 
 \item{tasks.left.out}{Number of questions to leave out for cross-validation.}
 

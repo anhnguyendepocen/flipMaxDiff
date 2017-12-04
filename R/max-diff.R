@@ -20,7 +20,7 @@
 #' @param trace Non-negative integer indicating the detail of outputs provided when fitting models: 0 indicates
 #' no outputs, and 6 is the most detailed outputs.
 #' @param lc Whether to run latent class step at the end if characteristics are supplied.
-#' @param output Output type. Can be "Default", "Probabilities" or "Classes".
+#' @param output Output type. Can be "Default", "Parameters", "Probabilities" or "Classes".
 #' @param tasks.left.out Number of questions to leave out for cross-validation.
 #' @param algorithm If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
 #'  parameters are ignored.
@@ -245,7 +245,7 @@ print.FitMaxDiff <- function(x, ...)
     else
         x$output
 
-    if (x$n.classes == 1 && !has.covariates && (!is.hb || output == "Classes"))
+    if (x$n.classes == 1 && !has.covariates && output %in% c("Classes", "Probabilities"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
