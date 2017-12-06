@@ -245,7 +245,8 @@ print.FitMaxDiff <- function(x, ...)
     else
         x$output
 
-    if (x$n.classes == 1 && !has.covariates && output %in% c("Classes", "Probabilities"))
+    if (x$n.classes == 1 && !has.covariates && !is.hb &&
+        output %in% c("Classes", "Probabilities"))
     {
         col.labels <- "Probabilities (%)"
         MaxDiffTableClasses(as.matrix(x$class.preference.shares), col.labels, title, subtitle, footer)
