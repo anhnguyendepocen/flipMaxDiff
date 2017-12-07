@@ -233,6 +233,9 @@ print.FitMaxDiff <- function(x, ...)
     else
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
+    if (has.covariates)
+        subtitle <- c(subtitle, paste0("Covariates: ", paste(x$covariates.notes, collapse = ", ")))
+
     output <- if (x$output == "Default")
         "Parameters"
     else
@@ -246,9 +249,6 @@ print.FitMaxDiff <- function(x, ...)
     }
     else if (output == "Probabilities")
     {
-        if (has.covariates)
-            subtitle <- c(subtitle, paste0("Covariates: ", paste(x$covariates.notes, collapse = ", ")))
-
         probs <- x$respondent.probabilities
         stats.table <- matrix(NA, nrow = ncol(probs), ncol = 1)
         for (i in 1:ncol(probs))
