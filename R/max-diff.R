@@ -234,14 +234,7 @@ print.FitMaxDiff <- function(x, ...)
         paste0("Prediction accuracy (in-sample): ", FormatAsPercent(x$in.sample.accuracy, 3))
 
     output <- if (x$output == "Default")
-    {
-        if (is.hb)
-            "Parameters"
-        else if (!has.covariates)
-            "Classes"
-        else
-            "Probabilities"
-    }
+        "Parameters"
     else
         x$output
 
