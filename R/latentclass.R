@@ -245,7 +245,7 @@ classPreferenceShares <- function(coef, class.sizes)
     n.classes <- ncol(coef)
     pref.shares <- exp(coef) / t(matrix(rep(colSums(exp(coef)), nrow(coef)), nrow = n.classes))
     result <- matrix(NA, nrow(pref.shares), ncol(pref.shares) + 1)
-    colnames(result) <- c(paste("Class", 1:n.classes), "Aggregate")
+    colnames(result) <- c(paste("Class", 1:n.classes), "Total")
     rownames(result) <- rownames(pref.shares)
     result[, 1:ncol(pref.shares)] <- pref.shares
     result[, ncol(pref.shares) + 1] <- rowSums(pref.shares *
