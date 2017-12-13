@@ -133,8 +133,8 @@ stanFileName <- function(n.classes, normal.covariance)
             result <- "exec/diagonalmixture.stan"
     }
 
-    if (!dir.exists("exec")) # not unit testing
-        result <- paste0("tests/testthat/", result)
+    result <- file.path(system.file("stan", package = "flipMaxDiff",
+                                    mustWork = TRUE), result)
 
     result
 }
