@@ -12,7 +12,7 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names,
   lc.tolerance = 1e-04, is.tricked = TRUE, hb.iterations = 500,
   hb.chains = 8, hb.max.tree.depth = 10, hb.adapt.delta = 0.8,
   hb.keep.samples = FALSE, hb.stanfit = TRUE, hb.warnings = TRUE,
-  hb.max.draws = 100)
+  hb.max.draws = 100, ...)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
@@ -79,6 +79,9 @@ Can be 'Full, 'Spherical', 'Diagonal'.}
 
 \item{hb.max.draws}{Maximum number of beta draws per respondent to return in
 beta.draws.}
+
+\item{...}{Additional parameters to pass on to \code{rstan::stan} and
+\code{rstan::sampling}.}
 }
 \description{
 Fits a latent class rank-ordered logit model with ties to a max-diff experiment.
