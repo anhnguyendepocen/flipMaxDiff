@@ -8,7 +8,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      include.stanfit = TRUE,
                                      normal.covariance = "Full",
                                      stan.warnings = TRUE,
-                                     max.draws = 100)
+                                     max.draws = 100, ...)
 {
     # We want to replace this call with a proper integration of rstan into this package
     require(rstan)
@@ -21,13 +21,13 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
     if (stan.warnings)
         stan.fit <- runStanSampling(stan.dat, n.classes, n.iterations,
                                     n.chains, normal.covariance,
-                                    max.tree.depth, adapt.delta, seed)
+                                    max.tree.depth, adapt.delta, seed, ...)
     else
         suppressWarnings(stan.fit <- runStanSampling(stan.dat, n.classes,
                                                      n.iterations, n.chains,
                                                      normal.covariance,
                                                      max.tree.depth,
-                                                     adapt.delta, seed))
+                                                     adapt.delta, seed), ...)
 
     result <- list()
     result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
@@ -42,7 +42,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
 
 runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                             normal.covariance, max.tree.depth, adapt.delta,
-                            seed)
+                            seed, ...)
 {
     pars <- c("theta", "sigma", "beta")
 
@@ -59,7 +59,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                              iter = n.iterations, seed = seed,
                              pars = pars,
                              control = list(max_treedepth = max.tree.depth,
-                                            adapt_delta = adapt.delta))
+                                            adapt_delta = adapt.delta), ...)
     }
     else # Not R servers
     {
@@ -70,7 +70,7 @@ runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
                          chains = n.chains, seed = seed,
                          pars = pars,
                          control = list(max_treedepth = max.tree.depth,
-                                        adapt_delta = adapt.delta))
+                                        adapt_delta = adapt.delta), ...)
     }
 }
 
@@ -121,16 +121,16 @@ stanFileName <- function(n.classes, normal.covariance)
     if (n.classes == 1)
     {
         if (normal.covariance == "Full")
-            result <- "exec/hb.stan"
+            result <- "hb.stan"
         else
-            result <- "exec/diagonal.stan"
+            result <- "diagonal.stan"
     }
     else
     {
         if (normal.covariance == "Full")
-            result <- "exec/mixtureofnormals.stan"
+            result <- "mixtureofnormals.stan"
         else
-            result <- "exec/diagonalmixture.stan"
+            result <- "diagonalmixture.stan"
     }
 
     result <- file.path(system.file("stan", package = "flipMaxDiff",
