@@ -1,6 +1,6 @@
 #' @importFrom rstan rstan_options stan extract sampling
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars ExtractBetaDraws
-#'  IsRServer
+#'  IsRServer RunStanSampling
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      max.tree.depth = 10, adapt.delta = 0.8,
                                      is.tricked = TRUE, seed = 123,
@@ -18,16 +18,30 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
 
     stan.dat <- createStanData(dat, n.classes, is.tricked, normal.covariance)
 
-    if (stan.warnings)
-        stan.fit <- runStanSampling(stan.dat, n.classes, n.iterations,
-                                    n.chains, normal.covariance,
-                                    max.tree.depth, adapt.delta, seed, ...)
+    if (IsRServer()) # R servers
+    {
+        stan.model <- stanModel(n.classes, normal.covariance)
+        stan.file <- NULL
+    }
     else
-        suppressWarnings(stan.fit <- runStanSampling(stan.dat, n.classes,
+    {
+        stan.model <- NULL
+        stan.file <- stanFileName(n.classes, normal.covariance)
+    }
+
+    if (stan.warnings)
+        stan.fit <- RunStanSampling(stan.dat, n.classes, n.iterations,
+                                    n.chains, normal.covariance,
+                                    max.tree.depth, adapt.delta, seed,
+                                    stan.model, stan.file, ...)
+    else
+        suppressWarnings(stan.fit <- RunStanSampling(stan.dat, n.classes,
                                                      n.iterations, n.chains,
                                                      normal.covariance,
                                                      max.tree.depth,
-                                                     adapt.delta, seed), ...)
+                                                     adapt.delta, seed,
+                                                     stan.model, stan.file,
+                                                     ...))
 
     result <- list()
     result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
@@ -38,40 +52,6 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
     }
     class(result) <- "FitMaxDiff"
     result
-}
-
-runStanSampling <- function(stan.dat, n.classes, n.iterations, n.chains,
-                            normal.covariance, max.tree.depth, adapt.delta,
-                            seed, ...)
-{
-    pars <- c("theta", "sigma", "beta")
-
-    if (IsRServer()) # R servers
-    {
-        # Loads a precompiled stan model called mod from sysdata.rda to avoid recompiling.
-        # The R code used to generate mod is:
-        # mod <- rstan::stan_model(model_code = model.code)
-        # devtools::use_data(mod, internal = TRUE, overwrite = TRUE)
-        # where model.code is the stan code as a string.
-        # Ideally we would want to recompile when the package is built (similar to Rcpp)
-        m <- stanModel(n.classes, normal.covariance)
-        stan.fit <- sampling(m, data = stan.dat, chains = n.chains,
-                             iter = n.iterations, seed = seed,
-                             pars = pars,
-                             control = list(max_treedepth = max.tree.depth,
-                                            adapt_delta = adapt.delta), ...)
-    }
-    else # Not R servers
-    {
-        rstan_options(auto_write = TRUE) # saves a compiled Stan object to avoid recompiling next time
-        stan.file <- stanFileName(n.classes, normal.covariance)
-        stan.fit <- stan(file = stan.file, data = stan.dat,
-                         iter = n.iterations,
-                         chains = n.chains, seed = seed,
-                         pars = pars,
-                         control = list(max_treedepth = max.tree.depth,
-                                        adapt_delta = adapt.delta), ...)
-    }
 }
 
 createStanData <- function(dat, n.classes, is.tricked, normal.covariance)
