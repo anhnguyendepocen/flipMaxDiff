@@ -8,7 +8,7 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      keep.samples = FALSE, n.classes = 1,
                                      include.stanfit = TRUE,
                                      normal.covariance = "Full",
-                                     stan.warnings = TRUE,
+                                     show.stan.warnings = TRUE,
                                      max.draws = 100, ...)
 {
     # We want to replace this call with a proper integration of rstan into this package
