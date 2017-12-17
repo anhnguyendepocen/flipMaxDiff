@@ -1,6 +1,7 @@
 #' @importFrom rstan rstan_options stan extract sampling
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars ExtractBetaDraws
-#'  IsRServer RunStanSampling
+#'  IsRServer RunStanSampling GetStanWarningHandler
+#' @importFrom flipU InterceptWarnings
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      max.tree.depth = 10, adapt.delta = 0.8,
                                      is.tricked = TRUE, seed = 123,
@@ -29,17 +30,13 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
         stan.file <- stanFileName(n.classes, normal.covariance)
     }
 
-    if (stan.warnings)
-        stan.fit <- RunStanSampling(stan.dat, n.iterations,
-                                    n.chains, max.tree.depth, adapt.delta,
-                                    seed, stan.model, stan.file, ...)
-    else
-        suppressWarnings(stan.fit <- RunStanSampling(stan.dat, n.iterations,
-                                                     n.chains,
-                                                     max.tree.depth,
-                                                     adapt.delta, seed,
-                                                     stan.model, stan.file,
-                                                     ...))
+    on.warnings <- GetStanWarningHandler(show.stan.warnings)
+
+    InterceptWarnings({
+        stan.fit <- RunStanSampling(stan.dat, n.iterations, n.chains,
+                                    max.tree.depth, adapt.delta, seed,
+                                    stan.model, stan.file, ...)},
+                                    on.warnings)
 
     result <- list()
     result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
