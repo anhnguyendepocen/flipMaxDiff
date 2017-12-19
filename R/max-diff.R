@@ -185,7 +185,7 @@ Memberships <- function(object)
 #' @param x FitMaxDiff object.
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
-#' @importFrom flipChoice RespondentParametersTable
+#' @importFrom flipChoice RespondentParametersTable ParameterStatisticsInfo
 #' @importFrom stats median quantile
 #' @export
 print.FitMaxDiff <- function(x, ...)
@@ -215,6 +215,12 @@ print.FitMaxDiff <- function(x, ...)
     {
         footer <- paste0(footer, "Log-likelihood: ", FormatAsReal(x$log.likelihood, decimals = 2), "; ")
         footer <- paste0(footer, "BIC: ", FormatAsReal(x$bic, decimals = 2), "; ")
+    }
+    if (x$algorithm == "HB-Stan")
+    {
+        footer <- paste0(footer,
+                         ParameterStatisticsInfo(x$parameter.statistics,
+                                                 colnames(x$respondent.parameters)))
     }
 
     footer <- if (!is.hb && !x$lc)

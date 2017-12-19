@@ -1,6 +1,6 @@
 #' @importFrom rstan rstan_options stan extract sampling
 #' @importFrom flipChoice ReduceStanFitSize ComputeRespPars ExtractBetaDraws
-#'  IsRServer RunStanSampling GetStanWarningHandler
+#'  IsRServer RunStanSampling GetStanWarningHandler GetParameterStatistics
 #' @importFrom flipU InterceptWarnings
 hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                      max.tree.depth = 10, adapt.delta = 0.8,
@@ -39,10 +39,16 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
                                     on.warnings)
 
     result <- list()
-    result$respondent.parameters <- ComputeRespPars(stan.fit, dat$alternative.names, dat$subset)
+    result$respondent.parameters <- ComputeRespPars(stan.fit,
+                                                    dat$alternative.names,
+                                                    dat$subset)
+    result$parameter.statistics <- GetParameterStatistics(stan.fit)
     if (include.stanfit)
     {
-        result$stan.fit <- if (keep.samples) stan.fit else ReduceStanFitSize(stan.fit)
+        result$stan.fit <- if (keep.samples)
+            stan.fit
+        else
+            ReduceStanFitSize(stan.fit)
         result$beta.draws <- ExtractBetaDraws(stan.fit, max.draws)
     }
     class(result) <- "FitMaxDiff"
