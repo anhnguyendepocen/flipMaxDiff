@@ -4,7 +4,7 @@
 \alias{FitMaxDiff}
 \title{\code{FitMaxDiff}}
 \usage{
-FitMaxDiff(design, version = NULL, best, worst, alternative.names,
+FitMaxDiff(design, version = NULL, best, worst, alternative.names = NULL,
   n.classes = 1, subset = NULL, weights = NULL, characteristics = NULL,
   seed = 123, initial.parameters = NULL, trace = 0,
   sub.model.outputs = FALSE, lc = TRUE, output = "Default",

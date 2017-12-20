@@ -287,10 +287,15 @@ test_that("Experimental designs with versions", {
                "Concerned about poverty", "Has served in the military",
                "Multilingual", "Entertaining", "Male",
                "From a traditional American background", "Christian")
+
+    # We expect an error here because the alternative
+    # "Concerned for minorities" should be
+    # "Concerned for the welfare of minorities" instead.
     expect_error(suppressWarnings(FitMaxDiff(design = des, dat$MDversion,
                                              best = best, worst = worst,
                                              alternative.names = names,
                                              is.tricked = TRUE)))
+
     names <- c("Decent/ethical", "Plain-speaking", "Healthy",
                "Successful in business", "Good in a crisis",
                "Experienced in government",

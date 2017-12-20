@@ -66,8 +66,10 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, n.questio
 
 #' @importFrom flipData CalibrateWeight CleanSubset CleanWeights
 #' @importFrom flipU TrimWhitespace
-cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.names, subset = NULL, weights = NULL,
-                              characteristics = NULL, seed, n.questions.left.out = 0)
+cleanAndCheckData <- function(design, version = NULL, best, worst,
+                              alternative.names = NULL, subset = NULL,
+                              weights = NULL, characteristics = NULL,
+                              seed = 123, n.questions.left.out = 0)
 {
     n <- nrow(best)
     # Tidying weights and subset
@@ -80,9 +82,9 @@ cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.n
         weights <- CalibrateWeight(weights)
     }
     # Alternative names.
-    if (missing(alternative.names))
-        stop("alternative.names are required.")
-    if (length(alternative.names) == 1)
+    if (is.null(alternative.names))
+        alternative.names <- extractAlternativeNames(design, best, worst)
+    else if (length(alternative.names) == 1)
         alternative.names <- strsplit(alternative.names, ",")[[1]]
     alternative.names <- TrimWhitespace(alternative.names)
     # Tidying up the best and worst choices.
@@ -171,4 +173,58 @@ cleanAndCheckData <- function(design, version = NULL, best, worst, alternative.n
          respondent.indices = dat$respondent.indices,
          characteristics = characteristics,
          subset = subset)
+}
+
+extractAlternativeNames <- function(design, best, worst)
+{
+    # The levels in best and worst can either:
+    # (1) Contain all the alternatives in the order corresponding to the
+    #     indices in the design. In this case, alternative names are just the
+    #     levels.
+    # (2) Contain only the alternatives present in the question corresponding
+    #     to the best or worst variable. The order of the alternatives should
+    #     match the order in the design. Alternative names can only be deduced
+    #     when there is only one version.
+
+    n.alternatives <- max(design[, -1:-2])
+    n.questions <- length(best)
+    first.levels <- levels(best[[1]])
+    error.msg <- paste0("Alternative names cannot be deduced as levels in the ",
+                        "best and worst variables are inconsistent.")
+    if (length(first.levels) == n.alternatives) # (1)
+    {
+        for (i in 1:n.questions)
+        {
+            if (any(first.levels != levels(best[[i]])) ||
+                any(first.levels != levels(worst[[i]])))
+                stop(error.msg)
+            alternative.names <- first.levels
+        }
+    }
+    else # (2)
+    {
+        if (any(design[[1]] != 1))
+            stop("Alternative names cannot be deduced as the levels in each ",
+                 "best and worst variable do not contain all the ",
+                 "alternatives and there is more than one version.")
+
+        alternative.names <- rep(NA, n.alternatives)
+        n.choices <- ncol(design) - 2
+        for (i in 1:n.questions)
+        {
+            best.levels <- levels(best[[i]])
+            worst.levels <- levels(worst[[i]])
+            if (any(best.levels != worst.levels))
+                stop(error.msg)
+            for (j in 1:n.choices)
+            {
+                nm <- alternative.names[design[i, j + 2]]
+                if (is.na(nm))
+                    alternative.names[design[i, j + 2]] <- best.levels[j]
+                else if (nm != best.levels[j])
+                    stop(error.msg)
+            }
+        }
+    }
+    alternative.names
 }

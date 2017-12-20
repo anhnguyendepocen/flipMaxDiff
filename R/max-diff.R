@@ -40,14 +40,17 @@
 #' @param ... Additional parameters to pass on to \code{rstan::stan} and
 #' \code{rstan::sampling}.
 #' @export
-FitMaxDiff <- function(design, version = NULL, best, worst, alternative.names, n.classes = 1,
-                       subset = NULL, weights = NULL, characteristics = NULL, seed = 123,
-                       initial.parameters = NULL, trace = 0, sub.model.outputs = FALSE, lc = TRUE,
+FitMaxDiff <- function(design, version = NULL, best, worst,
+                       alternative.names = NULL, n.classes = 1, subset = NULL,
+                       weights = NULL, characteristics = NULL, seed = 123,
+                       initial.parameters = NULL, trace = 0,
+                       sub.model.outputs = FALSE, lc = TRUE,
                        output = "Default", tasks.left.out = 0,
                        algorithm = "Default", normal.covariance = "Full",
                        lc.tolerance = 0.0001, is.tricked = TRUE,
-                       hb.iterations = 500, hb.chains = 8, hb.max.tree.depth = 10,
-                       hb.adapt.delta = 0.8, hb.keep.samples = FALSE, hb.stanfit = TRUE,
+                       hb.iterations = 500, hb.chains = 8,
+                       hb.max.tree.depth = 10, hb.adapt.delta = 0.8,
+                       hb.keep.samples = FALSE, hb.stanfit = TRUE,
                        hb.warnings = TRUE, hb.max.draws = 100, ...)
 {
     # For backwards compatibility

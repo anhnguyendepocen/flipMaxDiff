@@ -23,3 +23,28 @@ test_that("Reading data works", {
     expect_error(cleanAndCheckData(design = binary.design, best = best, worst = worst, alternative.names = names), NA)
 })
 
+test_that("Extract alternative names", {
+    extracted <- extractAlternativeNames(tech.design, best, worst)
+    names <- c("Apple", "Microsoft", "IBM", "Google", "Intel", "Samsung ",
+               "Sony", "Dell", "Yahoo", "Nokia")
+    expect_equal(extracted, names)
+
+    dat <- suppressWarnings(foreign::read.spss("http://wiki.q-researchsoftware.com/images/6/61/President.sav", to.data.frame = TRUE))
+    des <- read.csv("http://wiki.q-researchsoftware.com/images/9/9d/PresidentialDesign.csv")
+    best <- dat[, c("MDmost_1", "MDmost_2", "MDmost_3", "MDmost_4", "MDmost_5",
+                    "MDmost_6", "MDmost_7", "MDmost_8", "MDmost_9",
+                    "MDmost_10")]
+    worst <- dat[, c("MDleast_1", "MDleast_2", "MDleast_3" , "MDleast_4",
+                     "MDleast_5", "MDleast_6",  "MDleast_7", "MDleast_8",
+                     "MDleast_9", "MDleast_10")]
+    names <- c("Decent/ethical", "Plain-speaking", "Healthy",
+               "Successful in business", "Good in a crisis",
+               "Experienced in government",
+               "Concerned for the welfare of minorities",
+               "Understands economics", "Concerned about global warming",
+               "Concerned about poverty", "Has served in the military",
+               "Multilingual", "Entertaining", "Male",
+               "From a traditional American background", "Christian")
+    expect_equal(extractAlternativeNames(des, best, worst), names)
+})
+
