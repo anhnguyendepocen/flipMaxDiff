@@ -164,8 +164,7 @@ test_that("Checking some of the inputs", {
     des$Version <- 3
     expect_error(FitMaxDiff(design = des, best = best, worst = worst,
                             alternative.names = names, is.tricked = TRUE))
-    # No names
-    expect_error(FitMaxDiff(design = tech.design, best = best, worst = worst))
+
     # Incorrect names as a string
     alt.names <- "A,B,C,D,E,F,G,h,I,J"
     expect_error(suppressWarnings(FitMaxDiff(design = tech.design,

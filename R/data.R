@@ -204,8 +204,8 @@ extractAlternativeNames <- function(design, best, worst)
     else # (2)
     {
         if (any(design[[1]] != 1))
-            stop("Alternative names cannot be deduced as the levels in each ",
-                 "best and worst variable do not contain all the ",
+            stop("Alternative names need to be specified as the levels in ",
+                 "each best and worst variable do not contain all the ",
                  "alternatives and there is more than one version.")
 
         alternative.names <- rep(NA, n.alternatives)
