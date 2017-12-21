@@ -46,5 +46,10 @@ test_that("Extract alternative names", {
                "Multilingual", "Entertaining", "Male",
                "From a traditional American background", "Christian")
     expect_equal(extractAlternativeNames(des, best, worst), names)
+
+    reduced.levels <- levels(best[[3]])[-13] # remove unused level
+    best[[3]] <- factor(as.numeric(best[[3]]))
+    levels(best[[3]]) <- reduced.levels
+    expect_error(extractAlternativeNames(des, best, worst))
 })
 

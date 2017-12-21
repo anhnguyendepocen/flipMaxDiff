@@ -195,7 +195,9 @@ extractAlternativeNames <- function(design, best, worst)
     {
         for (i in 1:n.questions)
         {
-            if (any(first.levels != levels(best[[i]])) ||
+            if (length(first.levels) != length(levels(best[[i]])) ||
+                length(first.levels) != length(levels(worst[[i]])) ||
+                any(first.levels != levels(best[[i]])) ||
                 any(first.levels != levels(worst[[i]])))
                 stop(error.msg)
             alternative.names <- first.levels
@@ -214,7 +216,8 @@ extractAlternativeNames <- function(design, best, worst)
         {
             best.levels <- levels(best[[i]])
             worst.levels <- levels(worst[[i]])
-            if (any(best.levels != worst.levels))
+            if (length(best.levels) != length(worst.levels) ||
+                any(best.levels != worst.levels))
                 stop(error.msg)
             for (j in 1:n.choices)
             {
