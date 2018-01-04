@@ -8,10 +8,10 @@ names <- c("Apple", "Microsoft", "IBM", "Google", "Intel", "Samsung", "Sony", "D
 
 pres.data <- suppressWarnings(foreign::read.spss("http://wiki.q-researchsoftware.com/images/6/61/President.sav", to.data.frame = TRUE))
 pres.design <- read.csv("http://wiki.q-researchsoftware.com/images/9/9d/PresidentialDesign.csv")
-pres.best <- dat[, c("MDmost_1", "MDmost_2", "MDmost_3", "MDmost_4", "MDmost_5",
+pres.best <- pres.data[, c("MDmost_1", "MDmost_2", "MDmost_3", "MDmost_4", "MDmost_5",
                 "MDmost_6", "MDmost_7", "MDmost_8", "MDmost_9",
                 "MDmost_10")]
-pres.worst <- dat[, c("MDleast_1", "MDleast_2", "MDleast_3" , "MDleast_4",
+pres.worst <- pres.data[, c("MDleast_1", "MDleast_2", "MDleast_3" , "MDleast_4",
                  "MDleast_5", "MDleast_6",  "MDleast_7", "MDleast_8",
                  "MDleast_9", "MDleast_10")]
 pres.names <- c("Decent/ethical", "Plain-speaking", "Healthy",
