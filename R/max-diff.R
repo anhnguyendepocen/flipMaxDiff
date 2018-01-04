@@ -67,6 +67,8 @@ FitMaxDiff <- function(design, version = NULL, best, worst,
     apply.weights <- is.null(characteristics)
     n.questions.left.out <- tasks.left.out # we now refer to tasks as questions
 
+    start.time <- proc.time()
+
     dat <- cleanAndCheckData(design, version, best, worst, alternative.names, subset, weights,
                              characteristics, seed, n.questions.left.out)
 
@@ -90,6 +92,8 @@ FitMaxDiff <- function(design, version = NULL, best, worst,
         result <- varyingCoefficientsMaxDiff(dat, n.classes, seed, initial.parameters, trace, apply.weights,
                                              lc, sub.model.outputs, lc.tolerance, is.tricked)
 
+    end.time <- proc.time()
+
     result <- accuracyResults(dat, result, n.questions.left.out)
     if (sub.model.outputs)
         cat("Latent class analysis",
@@ -109,6 +113,7 @@ FitMaxDiff <- function(design, version = NULL, best, worst,
     resp.pars <- as.matrix(RespondentParameters(result))[dat$subset, ]
     result$respondent.probabilities <- exp(resp.pars) / rowSums(exp(resp.pars))
     result$algorithm <- algorithm
+    result$time.taken <- (end.time - start.time)[3]
     result
 }
 
@@ -189,6 +194,7 @@ Memberships <- function(object)
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
 #' @importFrom flipChoice RespondentParametersTable ParameterStatisticsInfo
+#' @importFrom flipTime FormatPeriod
 #' @importFrom stats median quantile
 #' @export
 print.FitMaxDiff <- function(x, ...)
@@ -237,6 +243,7 @@ print.FitMaxDiff <- function(x, ...)
         else
             paste0(footer, "Latent class analysis: ", x$n.classes, " classes; ")
     }
+    footer <- paste0(footer, "Time taken: ", FormatPeriod(x$time.taken), "; ")
 
     subtitle <- if (!is.na(x$out.sample.accuracy))
         paste0("Prediction accuracy (leave-", x$n.questions.left.out , "-out cross-validation): ",

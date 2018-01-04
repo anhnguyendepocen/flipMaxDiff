@@ -13,6 +13,7 @@ Imports: AlgDesign,
          flipChoice,
          flipData,
          flipFormat,
+         flipTime,
          flipU (>= 1.0.2),
          Rcpp (>= 0.12.10),
          rstan,
@@ -23,6 +24,7 @@ LinkingTo: Rcpp
 Remotes: Displayr/flipChoice,
          Displayr/flipData,
          Displayr/flipFormat,
+         Displayr/flipTime,
          Displayr/flipU
 RoxygenNote: 6.0.1
 Depends: R(>= 2.10.0)
