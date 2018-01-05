@@ -243,7 +243,7 @@ print.FitMaxDiff <- function(x, ...)
         else
             paste0(footer, "Latent class analysis: ", x$n.classes, " classes; ")
     }
-    footer <- paste0(footer, "Time taken: ", FormatPeriod(x$time.taken), "; ")
+    footer <- paste0(footer, "Time taken to run analysis: ", FormatPeriod(x$time.taken), "; ")
 
     subtitle <- if (!is.na(x$out.sample.accuracy))
         paste0("Prediction accuracy (leave-", x$n.questions.left.out , "-out cross-validation): ",
