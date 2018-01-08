@@ -194,6 +194,7 @@ Memberships <- function(object)
 #' @param ... further arguments passed to or from other methods.
 #' @importFrom flipFormat HistTable MaxDiffTableClasses FormatAsPercent FormatAsReal
 #' @importFrom flipChoice RespondentParametersTable ParameterStatisticsInfo
+#' IsTestRServer
 #' @importFrom flipTime FormatPeriod
 #' @importFrom stats median quantile
 #' @export
@@ -243,7 +244,11 @@ print.FitMaxDiff <- function(x, ...)
         else
             paste0(footer, "Latent class analysis: ", x$n.classes, " classes; ")
     }
-    footer <- paste0(footer, "Time taken to run analysis: ", FormatPeriod(x$time.taken), "; ")
+    if (IsTestRServer())
+        footer <- paste0(footer, "Time taken to run analysis: [hidden for tests]; ")
+    else
+        footer <- paste0(footer, "Time taken to run analysis: ",
+                         FormatPeriod(x$time.taken), "; ")
 
     subtitle <- if (!is.na(x$out.sample.accuracy))
         paste0("Prediction accuracy (leave-", x$n.questions.left.out , "-out cross-validation): ",
