@@ -71,6 +71,7 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
         coef <- matrix(0, nrow = n.beta + 1, ncol = n.classes)
         for (c in 1:n.classes)
             coef[2:(n.beta + 1), c] <- p[((c - 1) * n.beta + 1):(c * n.beta)]
+        coef <- apply(coef, 2, function(x) x - mean(x))
         rownames(coef) <- dat$alternative.names
         colnames(coef) <- paste("Class", 1:n.classes)
         result$class.sizes <- getClassWeights(p, n.classes, n.beta)
@@ -79,6 +80,7 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
     else
     {
         coef <- c(0, p)
+        coef <- coef - mean(coef)
         names(coef) <- dat$alternative.names
         result$class.sizes <- 1
         result$class.preference.shares <- exp(coef) / sum(exp(coef))
