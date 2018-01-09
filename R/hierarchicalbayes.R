@@ -42,7 +42,9 @@ hierarchicalBayesMaxDiff <- function(dat, n.iterations = 500, n.chains = 8,
     result$respondent.parameters <- ComputeRespPars(stan.fit,
                                                     dat$alternative.names,
                                                     dat$subset)
-    result$parameter.statistics <- GetParameterStatistics(stan.fit)
+    result$parameter.statistics <- GetParameterStatistics(stan.fit,
+                                                        dat$alternative.names,
+                                                        n.classes)
     if (include.stanfit)
     {
         result$stan.fit <- if (keep.samples)

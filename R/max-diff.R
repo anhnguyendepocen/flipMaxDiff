@@ -39,6 +39,32 @@
 #' beta.draws.
 #' @param ... Additional parameters to pass on to \code{rstan::stan} and
 #' \code{rstan::sampling}.
+#' @return A list with the following components:
+#' \itemize{
+#' \item \code{respondent.parameters} A matrix containing the parameters of
+#' each respondent.
+#' \item \code{parameter.statistics} A matrix containing parameter statistics
+#' such as effective sample size and Rhat.
+#' \item \code{stan.fit} The stanfit object from the analysis.
+#' \item \code{beta.draws} A 3D array containing sampling draws of beta for each
+#' respondent.
+#' \item \code{in.sample.accuracy} The in-sample prediction accuracy.
+#' \item \code{out.sample.accuracy} The out-of-sample prediction accuracy.
+#' \item \code{prediction.accuracies} A vector of prediction accuracies for
+#' each respondent.
+#' \item \code{algorithm} The type of algorithm used.
+#' \item \code{n.questions.left.out} The number of questions left out for
+#' out-of-sample testing.
+#' \item \code{n.classes} The number of classes.
+#' \item \code{n.respondents} The number of respondents.
+#' \item \code{n.questions} The number of questions per respondent.
+#' \item \code{n.choices} The number of choices per question.
+#' \item \code{output} The type of output when printed.
+#' \item \code{lc} Whether latent class analysis was run.
+#' \item \code{respondent.probabilities} Respondents probabilities of selecting
+#' each alternative.
+#' \item \code{time.taken} The time taken to run the analysis.
+#' }
 #' @export
 FitMaxDiff <- function(design, version = NULL, best, worst,
                        alternative.names = NULL, n.classes = 1, subset = NULL,
@@ -105,9 +131,9 @@ FitMaxDiff <- function(design, version = NULL, best, worst,
     result$subset <- subset
     result$weights <- weights
     result$n.questions <- dat$n.questions
-    result$n.alternatives.per.task <- ncol(dat$X.in)
+    result$n.choices <- ncol(dat$X.in)
     result$output <- output
-    result$lc <- lc
+    result$lc <- lc && algorithm == "Default"
     result$n.questions.left.out <- n.questions.left.out
 
     resp.pars <- as.matrix(RespondentParameters(result))[dat$subset, ]
@@ -220,7 +246,7 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "Questions used in estimation: ", x$n.questions - x$n.questions.left.out, "; ")
         footer <- paste0(footer, "Questions left out: ", x$n.questions.left.out, "; ")
     }
-    footer <- paste0(footer, "Alternatives per question: ", x$n.alternatives.per.task, "; ")
+    footer <- paste0(footer, "Alternatives per question: ", x$n.choices, "; ")
     if (!is.hb)
     {
         footer <- paste0(footer, "Log-likelihood: ", FormatAsReal(x$log.likelihood, decimals = 2), "; ")
@@ -230,7 +256,8 @@ print.FitMaxDiff <- function(x, ...)
     {
         footer <- paste0(footer,
                          ParameterStatisticsInfo(x$parameter.statistics,
-                                                 colnames(x$respondent.parameters)))
+                                            colnames(x$respondent.parameters),
+                                            x$n.classes))
     }
 
     footer <- if (!is.hb && !x$lc)
