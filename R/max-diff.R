@@ -50,9 +50,9 @@
 #'     Bayes.
 #' @param hb.chains The number of chains in Hierarchical Bayes.
 #' @param hb.max.tree.depth
-#'     http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
+#'     \url{http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded}
 #' @param hb.adapt.delta
-#'     http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+#'     \url{http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup}
 #' @param hb.keep.samples Whether to keep the samples of all the
 #'     parameters in the output.
 #' @param hb.stanfit Whether to include the stanfit property.

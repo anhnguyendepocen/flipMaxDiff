@@ -84,9 +84,9 @@ Bayes.}
 
 \item{hb.chains}{The number of chains in Hierarchical Bayes.}
 
-\item{hb.max.tree.depth}{http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded}
+\item{hb.max.tree.depth}{\url{http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded}}
 
-\item{hb.adapt.delta}{http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup}
+\item{hb.adapt.delta}{\url{http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup}}
 
 \item{hb.keep.samples}{Whether to keep the samples of all the
 parameters in the output.}
