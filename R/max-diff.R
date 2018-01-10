@@ -1,68 +1,93 @@
-#' \code{FitMaxDiff}
-#' @description Fits a latent class rank-ordered logit model with ties to a max-diff experiment.
-#' @param design A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
-#' and the remaining variables contain the alternatives shown in each task.
-#' @param version A vector of integers showing the version of the design shown to each respondent.
-#' @param best A data frame of factors or a matrix of integers showing the choices made by each respondent on each of the questions. One column
-#' for each task. The integers need to correspond to the \code{design} vector of integers showing the version of
-#' the design shown to each respondent. Coerced to a matrix if a \code{data.frame}.
+#' Rank-Ordered Logit Model for Max-Diff Experiments
+#'
+#' Fits a latent class rank-ordered logit model with ties
+#'     to a max-diff experiment.
+#' @param design A \code{data.frame}, where the first variable is
+#'     called 'Version', the second is called 'Task' or 'Question',
+#'     and the remaining variables contain the alternatives shown in
+#'     each task.
+#' @param version A vector of integers showing the version of the
+#'     design shown to each respondent.
+#' @param best A data frame of factors or a matrix of integers showing
+#'     the choices made by each respondent on each of the
+#'     questions. One column for each task. The integers need to
+#'     correspond to the \code{design} vector of integers showing the
+#'     version of the design shown to each respondent. Coerced to a
+#'     matrix if a \code{data.frame}.
 #' @param worst As with 'best', except denoting worst..
-#' @param alternative.names A \code{character} vector of the alternative names. Where \code{best}
-#' and  \code{worst} are factors or characters, these names must match them.
+#' @param alternative.names A \code{character} vector of the
+#'     alternative names. Where \code{best} and \code{worst} are
+#'     factors or characters, these names must match them.
 #' @param n.classes The number of latent classes.
-#' @param subset An optional vector specifying a subset of observations to be
-#' used in the fitting process.
+#' @param subset An optional vector specifying a subset of
+#'     observations to be used in the fitting process.
 #' @param weights An optional vector of sampling or frequency weights.
-#' @param characteristics Data frame of characteristics on which to run varying coefficients by latent class boosting.
+#' @param characteristics Data frame of characteristics on which to
+#'     run varying coefficients by latent class boosting.
 #' @param seed Random seed.
-#' @param initial.parameters Specify initial parameters intead of starting at random.
-#' @param sub.model.outputs If TRUE, prints diagnostics on interim models.
-#' @param trace Non-negative integer indicating the detail of outputs provided when fitting models: 0 indicates
-#' no outputs, and 6 is the most detailed outputs.
-#' @param lc Whether to run latent class step at the end if characteristics are supplied.
-#' @param output Output type. Can be "Default", "Parameters", "Probabilities" or "Classes".
-#' @param tasks.left.out Number of questions to leave out for cross-validation.
-#' @param algorithm If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
-#'  parameters are ignored.
-#' @param normal.covariance The form of the covariance matrix for Hierarchical Bayes.
-#' Can be 'Full, 'Spherical', 'Diagonal'.
-#' @param lc.tolerance The tolerance used for defining convergence in latent class analysis.
-#' @param is.tricked Whether to use tricked logit instead of rank-ordered logit with ties.
-#' @param hb.iterations The number of iterations in Hierarchical Bayes.
+#' @param initial.parameters Specify initial parameters intead of
+#'     starting at random.
+#' @param sub.model.outputs If TRUE, prints diagnostics on interim
+#'     models.
+#' @param trace Non-negative integer indicating the detail of outputs
+#'     provided when fitting models: 0 indicates no outputs, and 6 is
+#'     the most detailed outputs.
+#' @param lc Whether to run latent class step at the end if
+#'     characteristics are supplied.
+#' @param output Output type. Can be "Default", "Parameters",
+#'     "Probabilities" or "Classes".
+#' @param tasks.left.out Number of questions to leave out for
+#'     cross-validation.
+#' @param algorithm If "HB-Stan" or "HB-bayesm", Hierarchical Bayes
+#'     with a MVN prior is used and the other parameters are ignored.
+#' @param normal.covariance The form of the covariance matrix for
+#'     Hierarchical Bayes.  Can be 'Full, 'Spherical', 'Diagonal'.
+#' @param lc.tolerance The tolerance used for defining convergence in
+#'     latent class analysis.
+#' @param is.tricked Whether to use tricked logit instead of
+#'     rank-ordered logit with ties.
+#' @param hb.iterations The number of iterations in Hierarchical
+#'     Bayes.
 #' @param hb.chains The number of chains in Hierarchical Bayes.
-#' @param hb.max.tree.depth http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
-#' @param hb.adapt.delta http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-#' @param hb.keep.samples Whether to keep the samples of all the parameters in the output.
+#' @param hb.max.tree.depth
+#'     http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
+#' @param hb.adapt.delta
+#'     http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+#' @param hb.keep.samples Whether to keep the samples of all the
+#'     parameters in the output.
 #' @param hb.stanfit Whether to include the stanfit property.
 #' @param hb.warnings Whether to show warnings from Stan.
-#' @param hb.max.draws Maximum number of beta draws per respondent to return in
-#' beta.draws.
-#' @param ... Additional parameters to pass on to \code{rstan::stan} and
-#' \code{rstan::sampling}.
+#' @param hb.max.draws Maximum number of beta draws per respondent to
+#'     return in beta.draws.
+#' @param ... Additional parameters to pass on to
+#'     \code{\link[rstan]{stan}} and \code{\link[rstan]{sampling}}.
 #' @return A list with the following components:
 #' \itemize{
-#' \item \code{respondent.parameters} A matrix containing the parameters of
-#' each respondent.
-#' \item \code{parameter.statistics} A matrix containing parameter statistics
-#' such as effective sample size and Rhat.
-#' \item \code{stan.fit} The stanfit object from the analysis.
-#' \item \code{beta.draws} A 3D array containing sampling draws of beta for each
-#' respondent.
+#' \item \code{respondent.parameters} A matrix containing the parameters
+#'     of each respondent.
+#' \item \code{parameter.statistics} A matrix
+#'     containing parameter statistics such as effective sample size
+#'     and Rhat.
+#' \item \code{stan.fit} The \ocde{\link[rstan]{stanfit}} object from the
+#'     analysis.
+#' \item \code{beta.draws} A 3D array containing
+#'     sampling draws of beta for each respondent.
 #' \item \code{in.sample.accuracy} The in-sample prediction accuracy.
-#' \item \code{out.sample.accuracy} The out-of-sample prediction accuracy.
-#' \item \code{prediction.accuracies} A vector of prediction accuracies for
-#' each respondent.
+#'  \item \code{out.sample.accuracy} The out-of-sample prediction
+#'     accuracy.
+#' \item \code{prediction.accuracies} A vector of
+#'     prediction accuracies for each respondent.
 #' \item \code{algorithm} The type of algorithm used.
-#' \item \code{n.questions.left.out} The number of questions left out for
-#' out-of-sample testing.
+#' \item \code{n.questions.left.out} The number of questions left out
+#'     for out-of-sample testing.
 #' \item \code{n.classes} The number of classes.
 #' \item \code{n.respondents} The number of respondents.
 #' \item \code{n.questions} The number of questions per respondent.
 #' \item \code{n.choices} The number of choices per question.
 #' \item \code{output} The type of output when printed.
 #' \item \code{lc} Whether latent class analysis was run.
-#' \item \code{respondent.probabilities} Respondents probabilities of selecting
-#' each alternative.
+#' \item \code{respondent.probabilities} Respondents probabilities of
+#' selecting each alternative.
 #' \item \code{time.taken} The time taken to run the analysis.
 #' }
 #' @export

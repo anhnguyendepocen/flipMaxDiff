@@ -2,7 +2,7 @@
 % Please edit documentation in R/max-diff.R
 \name{FitMaxDiff}
 \alias{FitMaxDiff}
-\title{\code{FitMaxDiff}}
+\title{Rank-Ordered Logit Model for Max-Diff Experiments}
 \usage{
 FitMaxDiff(design, version = NULL, best, worst, alternative.names = NULL,
   n.classes = 1, subset = NULL, weights = NULL, characteristics = NULL,
@@ -15,55 +15,72 @@ FitMaxDiff(design, version = NULL, best, worst, alternative.names = NULL,
   hb.max.draws = 100, ...)
 }
 \arguments{
-\item{design}{A \code{data.frame}, where the first variable is called 'Version', the second is called 'Task' or 'Question',
-and the remaining variables contain the alternatives shown in each task.}
+\item{design}{A \code{data.frame}, where the first variable is
+called 'Version', the second is called 'Task' or 'Question',
+and the remaining variables contain the alternatives shown in
+each task.}
 
-\item{version}{A vector of integers showing the version of the design shown to each respondent.}
+\item{version}{A vector of integers showing the version of the
+design shown to each respondent.}
 
-\item{best}{A data frame of factors or a matrix of integers showing the choices made by each respondent on each of the questions. One column
-for each task. The integers need to correspond to the \code{design} vector of integers showing the version of
-the design shown to each respondent. Coerced to a matrix if a \code{data.frame}.}
+\item{best}{A data frame of factors or a matrix of integers showing
+the choices made by each respondent on each of the
+questions. One column for each task. The integers need to
+correspond to the \code{design} vector of integers showing the
+version of the design shown to each respondent. Coerced to a
+matrix if a \code{data.frame}.}
 
 \item{worst}{As with 'best', except denoting worst..}
 
-\item{alternative.names}{A \code{character} vector of the alternative names. Where \code{best}
-and  \code{worst} are factors or characters, these names must match them.}
+\item{alternative.names}{A \code{character} vector of the
+alternative names. Where \code{best} and \code{worst} are
+factors or characters, these names must match them.}
 
 \item{n.classes}{The number of latent classes.}
 
-\item{subset}{An optional vector specifying a subset of observations to be
-used in the fitting process.}
+\item{subset}{An optional vector specifying a subset of
+observations to be used in the fitting process.}
 
 \item{weights}{An optional vector of sampling or frequency weights.}
 
-\item{characteristics}{Data frame of characteristics on which to run varying coefficients by latent class boosting.}
+\item{characteristics}{Data frame of characteristics on which to
+run varying coefficients by latent class boosting.}
 
 \item{seed}{Random seed.}
 
-\item{initial.parameters}{Specify initial parameters intead of starting at random.}
+\item{initial.parameters}{Specify initial parameters intead of
+starting at random.}
 
-\item{trace}{Non-negative integer indicating the detail of outputs provided when fitting models: 0 indicates
-no outputs, and 6 is the most detailed outputs.}
+\item{trace}{Non-negative integer indicating the detail of outputs
+provided when fitting models: 0 indicates no outputs, and 6 is
+the most detailed outputs.}
 
-\item{sub.model.outputs}{If TRUE, prints diagnostics on interim models.}
+\item{sub.model.outputs}{If TRUE, prints diagnostics on interim
+models.}
 
-\item{lc}{Whether to run latent class step at the end if characteristics are supplied.}
+\item{lc}{Whether to run latent class step at the end if
+characteristics are supplied.}
 
-\item{output}{Output type. Can be "Default", "Parameters", "Probabilities" or "Classes".}
+\item{output}{Output type. Can be "Default", "Parameters",
+"Probabilities" or "Classes".}
 
-\item{tasks.left.out}{Number of questions to leave out for cross-validation.}
+\item{tasks.left.out}{Number of questions to leave out for
+cross-validation.}
 
-\item{algorithm}{If "HB-Stan" or "HB-bayesm", Hierarchical Bayes with a MVN prior is used and the other
-parameters are ignored.}
+\item{algorithm}{If "HB-Stan" or "HB-bayesm", Hierarchical Bayes
+with a MVN prior is used and the other parameters are ignored.}
 
-\item{normal.covariance}{The form of the covariance matrix for Hierarchical Bayes.
-Can be 'Full, 'Spherical', 'Diagonal'.}
+\item{normal.covariance}{The form of the covariance matrix for
+Hierarchical Bayes.  Can be 'Full, 'Spherical', 'Diagonal'.}
 
-\item{lc.tolerance}{The tolerance used for defining convergence in latent class analysis.}
+\item{lc.tolerance}{The tolerance used for defining convergence in
+latent class analysis.}
 
-\item{is.tricked}{Whether to use tricked logit instead of rank-ordered logit with ties.}
+\item{is.tricked}{Whether to use tricked logit instead of
+rank-ordered logit with ties.}
 
-\item{hb.iterations}{The number of iterations in Hierarchical Bayes.}
+\item{hb.iterations}{The number of iterations in Hierarchical
+Bayes.}
 
 \item{hb.chains}{The number of chains in Hierarchical Bayes.}
 
@@ -71,46 +88,51 @@ Can be 'Full, 'Spherical', 'Diagonal'.}
 
 \item{hb.adapt.delta}{http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup}
 
-\item{hb.keep.samples}{Whether to keep the samples of all the parameters in the output.}
+\item{hb.keep.samples}{Whether to keep the samples of all the
+parameters in the output.}
 
 \item{hb.stanfit}{Whether to include the stanfit property.}
 
 \item{hb.warnings}{Whether to show warnings from Stan.}
 
-\item{hb.max.draws}{Maximum number of beta draws per respondent to return in
-beta.draws.}
+\item{hb.max.draws}{Maximum number of beta draws per respondent to
+return in beta.draws.}
 
-\item{...}{Additional parameters to pass on to \code{rstan::stan} and
-\code{rstan::sampling}.}
+\item{...}{Additional parameters to pass on to
+\code{\link[rstan]{stan}} and \code{\link[rstan]{sampling}}.}
 }
 \value{
 A list with the following components:
 \itemize{
-\item \code{respondent.parameters} A matrix containing the parameters of
-each respondent.
-\item \code{parameter.statistics} A matrix containing parameter statistics
-such as effective sample size and Rhat.
-\item \code{stan.fit} The stanfit object from the analysis.
-\item \code{beta.draws} A 3D array containing sampling draws of beta for each
-respondent.
+\item \code{respondent.parameters} A matrix containing the parameters
+    of each respondent.
+\item \code{parameter.statistics} A matrix
+    containing parameter statistics such as effective sample size
+    and Rhat.
+\item \code{stan.fit} The \ocde{\link[rstan]{stanfit}} object from the
+    analysis.
+\item \code{beta.draws} A 3D array containing
+    sampling draws of beta for each respondent.
 \item \code{in.sample.accuracy} The in-sample prediction accuracy.
-\item \code{out.sample.accuracy} The out-of-sample prediction accuracy.
-\item \code{prediction.accuracies} A vector of prediction accuracies for
-each respondent.
+ \item \code{out.sample.accuracy} The out-of-sample prediction
+    accuracy.
+\item \code{prediction.accuracies} A vector of
+    prediction accuracies for each respondent.
 \item \code{algorithm} The type of algorithm used.
-\item \code{n.questions.left.out} The number of questions left out for
-out-of-sample testing.
+\item \code{n.questions.left.out} The number of questions left out
+    for out-of-sample testing.
 \item \code{n.classes} The number of classes.
 \item \code{n.respondents} The number of respondents.
 \item \code{n.questions} The number of questions per respondent.
 \item \code{n.choices} The number of choices per question.
 \item \code{output} The type of output when printed.
 \item \code{lc} Whether latent class analysis was run.
-\item \code{respondent.probabilities} Respondents probabilities of selecting
-each alternative.
+\item \code{respondent.probabilities} Respondents probabilities of
+selecting each alternative.
 \item \code{time.taken} The time taken to run the analysis.
 }
 }
 \description{
-Fits a latent class rank-ordered logit model with ties to a max-diff experiment.
+Fits a latent class rank-ordered logit model with ties
+    to a max-diff experiment.
 }
