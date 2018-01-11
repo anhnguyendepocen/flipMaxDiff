@@ -105,7 +105,7 @@ transformed data {
 
 parameters {
     vector[K - 1] theta_raw[P];
-    vector<lower=0, upper=pi()/2>[U] sigma_unif[P];
+    vector<lower=0>[U] sigma_unique[P];
     vector[K] standard_normal[R, P];
     simplex[P] class_weights;
 }
@@ -124,12 +124,11 @@ transformed parameters {
 
         if (U == 1) // Spherical
         {
-            real sigma_value = 2.5 * tan(sigma_unif[p, 1]);
             for (k in 1:K)
-                sigma[p, k] = sigma_value;
+                sigma[p, k] = sigma_unique[p, 1];
         }
         else // Diagonal
-            sigma[p] = 2.5 * tan(sigma_unif[p]);
+            sigma[p] = sigma_unique[p];
 
         for (r in 1:R)
             class_beta[r, p] = theta[p] + sigma[p] .* standard_normal[r, p];
@@ -158,6 +157,9 @@ transformed parameters {
 model {
     for (p in 1:P)
     {
+        // gamma distribution with mode = 1 and p(x < 20) = 0.999
+        sigma_unique[p] ~ gamma(1.39435729464721, 0.39435729464721);
+
         theta_raw[p] ~ normal(0, 5);
         for (r in 1:R)
             standard_normal[r, p] ~ normal(0, 1);

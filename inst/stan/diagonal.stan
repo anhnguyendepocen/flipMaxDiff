@@ -104,7 +104,7 @@ transformed data {
 
 parameters {
     vector[K - 1] theta_raw;
-    vector<lower=0, upper=pi()/2>[U] sigma_unif;
+    vector<lower=0>[U] sigma_unique;
     vector[K] standard_normal[R];
 }
 
@@ -116,12 +116,11 @@ transformed parameters {
 
     if (U == 1)
     {
-        real sigma_value = 2.5 * tan(sigma_unif[1]);
         for (k in 1:K)
-            sigma[k] = sigma_value;
+            sigma[k] = sigma_unique[1];
     }
     else
-        sigma = 2.5 * tan(sigma_unif);
+        sigma = sigma_unique;
 
     theta[1] = -sum(theta_raw);
     for (k in 1:(K - 1))
@@ -137,6 +136,10 @@ transformed parameters {
 
 model {
     //priors
+
+    // gamma distribution with mode = 1 and p(x < 20) = 0.999
+    sigma_unique ~ gamma(1.39435729464721, 0.39435729464721);
+
     theta_raw ~ normal(0, 5);
 
     for (r in 1:R)
