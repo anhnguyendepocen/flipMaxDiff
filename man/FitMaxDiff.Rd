@@ -109,7 +109,7 @@ A list with the following components:
 \item \code{parameter.statistics} A matrix
     containing parameter statistics such as effective sample size
     and Rhat.
-\item \code{stan.fit} The \ocde{\link[rstan]{stanfit}} object from the
+\item \code{stan.fit} The \code{\link[rstan]{stanfit}} object from the
     analysis.
 \item \code{beta.draws} A 3D array containing
     sampling draws of beta for each respondent.
