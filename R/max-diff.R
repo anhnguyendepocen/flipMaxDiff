@@ -271,7 +271,7 @@ print.FitMaxDiff <- function(x, ...)
         footer <- paste0(footer, "Questions used in estimation: ", x$n.questions - x$n.questions.left.out, "; ")
         footer <- paste0(footer, "Questions left out: ", x$n.questions.left.out, "; ")
     }
-    footer <- paste0(footer, "Alternatives per question: ", x$n.choices, "; ")
+    footer <- paste0(footer, "Alternatives per question: ", x$n.alternatives.per.task, "; ")
     if (!is.hb)
     {
         footer <- paste0(footer, "Log-likelihood: ", FormatAsReal(x$log.likelihood, decimals = 2), "; ")
