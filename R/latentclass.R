@@ -64,18 +64,20 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
     else
         input.respondent.pars <- resp.pars
 
-    result <- list(posterior.probabilities = posterior.probabilities,
-                   log.likelihood = ll)
+    result <- list(log.likelihood = ll)
     if (n.classes > 1)
     {
-        coef <- matrix(0, nrow = n.beta + 1, ncol = n.classes)
-        for (c in 1:n.classes)
-            coef[2:(n.beta + 1), c] <- p[((c - 1) * n.beta + 1):(c * n.beta)]
-        coef <- apply(coef, 2, function(x) x - mean(x))
-        rownames(coef) <- dat$alternative.names
-        colnames(coef) <- paste("Class", 1:n.classes)
-        result$class.sizes <- getClassWeights(p, n.classes, n.beta)
-        result$class.preference.shares <- classPreferenceShares(coef, result$class.sizes)
+        class.sizes <- getClassWeights(p, n.classes, n.beta)
+        # Reorder classes from largest to smallest
+        mapping <- n.classes - rank(class.sizes) + 1
+        posterior.probabilities <- posterior.probabilities[, mapping]
+        class.sizes <- class.sizes[mapping]
+        coef <- createCoefMatrix(p, dat$alternative.names, n.classes, n.beta,
+                                 mapping, class.sizes)
+
+        result$class.sizes <- class.sizes
+        result$class.preference.shares <- classPreferenceShares(coef,
+                                                                class.sizes)
     }
     else
     {
@@ -85,6 +87,7 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
         result$class.sizes <- 1
         result$class.preference.shares <- exp(coef) / sum(exp(coef))
     }
+    result$posterior.probabilities <- posterior.probabilities
     result$coef <- coef
     result$effective.sample.size <- ess <- sum(weights) / n.questions
     result$n.parameters <- numberOfParameters(n.beta, n.classes) + n.previous.parameters
@@ -322,4 +325,18 @@ numberOfParameters <- function(n.beta, n.classes, is.mixture.of.normals = FALSE,
             stop(paste("Distribution not handled:", normal.covariance))
     }
     result
+}
+
+createCoefMatrix <- function(p, alternative.names, n.classes, n.beta, mapping,
+                             class.sizes)
+{
+    coef <- matrix(0, nrow = n.beta + 1, ncol = n.classes)
+    for (c in 1:n.classes)
+        coef[2:(n.beta + 1), c] <- p[((c - 1) * n.beta + 1):(c * n.beta)]
+    coef <- apply(coef, 2, function(x) x - mean(x))
+    coef <- coef[, mapping]
+    rownames(coef) <- alternative.names
+    colnames(coef) <- paste0(paste("Class", 1:n.classes), " (",
+                             FormatAsPercent(class.sizes, 3), ")")
+    coef
 }
