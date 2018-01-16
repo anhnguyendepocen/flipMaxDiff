@@ -46,7 +46,8 @@ test_that("Extract alternative names", {
     expect_equal(extracted, tech.names)
 
 
-    expect_equal(extractAlternativeNames(pres.design, pres.best, pres.worst), pres.names)
+    expect_equal(extractAlternativeNames(pres.design, pres.best, pres.worst),
+                 pres.names)
 
     reduced.levels <- levels(pres.best[[3]])[-13] # remove unused level
     pres.best[[3]] <- factor(as.numeric(pres.best[[3]]))
@@ -54,3 +55,79 @@ test_that("Extract alternative names", {
     expect_error(extractAlternativeNames(pres.design, pres.best, pres.worst))
 })
 
+test_that("Construct design", {
+    design.alternatives <- structure(list(
+        alt1 = structure(c(1L, 1L, 2L, 3L, 2L, 1L),
+                         class = "factor",
+                         .Label = c("1", "2", "3", "4", "5", "6", "7", "8",
+                                    "9", "10"),
+                         questiontype = "PickOneMulti",
+                         name = "Alt.1", label = "1", question = "Alt"),
+        alt2 = structure(c(2L, 7L, 5L, 4L, 4L, 3L),
+                         class = "factor",
+                         .Label = c("1", "2", "3", "4", "5", "6", "7", "8",
+                                    "9", "10"),
+                         questiontype = "PickOneMulti",
+                         name = "Alt.2", label = "2", question = "Alt"),
+        alt3 = structure(c(3L, 8L, 6L, 5L, 6L, 5L),
+                         class = "factor",
+                         .Label = c("1", "2", "3", "4", "5", "6", "7", "8",
+                                    "9", "10"),
+                         questiontype = "PickOneMulti",
+                         name = "Alt.3", label = "3", question = "Alt"),
+        alt4 = structure(c(4L, 9L, 7L, 7L, 8L, 6L),
+                         class = "factor",
+                         .Label = c("1", "2", "3", "4", "5", "6", "7", "8",
+                                    "9", "10"),
+                         questiontype = "PickOneMulti",
+                         name = "Alt.4", label = "4", question = "Alt"),
+        alt5 = structure(c(10L, 10L, 10L, 8L, 9L, 9L),
+                         class = "factor",
+                         .Label = c("1", "2", "3", "4", "5", "6", "7", "8",
+                                    "9", "10"),
+                         questiontype = "PickOneMulti",
+                         name = "Alt.5", label = "5", question = "Alt")),
+        .Names = c("alt1", "alt2", "alt3", "alt4", "alt5" ),
+        row.names = c(NA, -6L), class = "data.frame")
+
+    design.version <- structure(c(1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L,
+                                  2L),
+                                class = "factor", .Label = c("1", "2"),
+                                questiontype = "PickOne", name = "Version",
+                                label = "Version", question = "Version")
+
+    expect_equal(constructDesign(design.alternatives, NULL),
+                 structure(list(Version = c(1, 1, 1, 1, 1, 1),
+                                Task = 1:6,
+                                Alt.1 = c(1, 1, 2, 3, 2, 1),
+                                Alt.2 = c(2, 7, 5, 4, 4, 3),
+                                Alt.3 = c(3, 8, 6, 5, 6, 5),
+                                Alt.4 = c(4, 9, 7, 7, 8, 6),
+                                Alt.5 = c(10, 10, 10, 8, 9, 9)),
+                           .Names = c("Version", "Task", "Alt.1",
+                                      "Alt.2", "Alt.3", "Alt.4", "Alt.5"),
+                           row.names = c(NA, -6L), class = "data.frame"))
+
+    expect_equal(constructDesign(rbind(design.alternatives,
+                                       design.alternatives), design.version),
+        structure(list(Version = c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2),
+        Task = c(1L, 2L, 3L, 4L, 5L, 6L, 1L, 2L, 3L, 4L, 5L, 6L),
+        Alt.1 = c(1, 1, 2, 3, 2, 1, 1, 1, 2, 3, 2, 1),
+        Alt.2 = c(2, 7, 5, 4, 4, 3, 2, 7, 5, 4, 4, 3),
+        Alt.3 = c(3, 8, 6, 5, 6, 5, 3, 8, 6, 5, 6, 5),
+        Alt.4 = c(4, 9, 7, 7, 8, 6, 4, 9, 7, 7, 8, 6),
+        Alt.5 = c(10, 10, 10, 8, 9, 9, 10, 10, 10, 8, 9, 9)),
+        .Names = c("Version", "Task", "Alt.1", "Alt.2",
+                   "Alt.3", "Alt.4", "Alt.5"),
+        row.names = c(NA, -12L), class = "data.frame"))
+
+    invalid.design.version <- structure(c(1L, 1L, 1L, 1L, 1L),
+                                class = "factor", .Label = c("1", "2"),
+                                questiontype = "PickOne", name = "Version",
+                                label = "Version", question = "Version")
+
+    expect_error(constructDesign(design.alternatives,
+                                 invalid.design.version),
+                 paste0("The design version is invalid as its length does ",
+                        "not match the design alternatives."))
+})

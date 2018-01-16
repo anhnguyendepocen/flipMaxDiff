@@ -66,11 +66,16 @@ IntegrateDesignAndData <- function(design, version, best, worst, seed, n.questio
 
 #' @importFrom flipData CalibrateWeight CleanSubset CleanWeights
 #' @importFrom flipU TrimWhitespace
-cleanAndCheckData <- function(design, version = NULL, best, worst,
+cleanAndCheckData <- function(design = NULL, version = NULL, best, worst,
+                              design.alternatives = NULL,
+                              design.version = NULL,
                               alternative.names = NULL, subset = NULL,
                               weights = NULL, characteristics = NULL,
                               seed = 123, n.questions.left.out = 0)
 {
+    if (is.null(design))
+        design <- constructDesign(design.alternatives, design.version)
+
     n <- nrow(best)
     # Tidying weights and subset
     if (!is.null(weights))
@@ -230,4 +235,30 @@ extractAlternativeNames <- function(design, best, worst)
         }
     }
     alternative.names
+}
+
+constructDesign <- function(design.alternatives, design.version)
+{
+    design.alternatives <- data.frame(sapply(design.alternatives, as.numeric))
+    n.rows.in.design <- nrow(design.alternatives)
+    names(design.alternatives) <- paste0("Alt.", 1:length(design.alternatives))
+    if (is.null(design.version))
+        result <- data.frame(Version = rep(1, n.rows.in.design),
+                             Task = 1:n.rows.in.design,
+                             design.alternatives)
+    else
+    {
+        if (length(design.version) != n.rows.in.design)
+            stop("The design version is invalid as its length does not match ",
+                 "the design alternatives.")
+        n.versions <- length(unique(design.version))
+        n.choices <- n.rows.in.design / n.versions
+        if (n.choices != round(n.choices))
+            stop("The design version is invalid. Check that the number of ",
+                 "entries for each version number is the same.")
+        result <- data.frame(Version = as.numeric(design.version),
+                             Task = rep(1:n.choices, n.versions),
+                             design.alternatives)
+    }
+    result
 }

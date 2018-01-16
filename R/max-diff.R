@@ -14,7 +14,11 @@
 #'     correspond to the \code{design} vector of integers showing the
 #'     version of the design shown to each respondent. Coerced to a
 #'     matrix if a \code{data.frame}.
-#' @param worst As with 'best', except denoting worst..
+#' @param worst As with 'best', except denoting worst.
+#' @param design.alternatives A data frame containing the alternatives in the
+#'     design. This can be passed in instead of the \code{design} parameter.
+#' @param design.version A data frame containing the version numbers
+#'     corresponding to \code{design.alternatives}.
 #' @param alternative.names A \code{character} vector of the
 #'     alternative names. Where \code{best} and \code{worst} are
 #'     factors or characters, these names must match them.
@@ -91,7 +95,8 @@
 #' \item \code{time.taken} The time taken to run the analysis.
 #' }
 #' @export
-FitMaxDiff <- function(design, version = NULL, best, worst,
+FitMaxDiff <- function(design = NULL, version = NULL, best, worst,
+                       design.alternatives = NULL, design.version = NULL,
                        alternative.names = NULL, n.classes = 1, subset = NULL,
                        weights = NULL, characteristics = NULL, seed = 123,
                        initial.parameters = NULL, trace = 0,
@@ -120,8 +125,10 @@ FitMaxDiff <- function(design, version = NULL, best, worst,
 
     start.time <- proc.time()
 
-    dat <- cleanAndCheckData(design, version, best, worst, alternative.names, subset, weights,
-                             characteristics, seed, n.questions.left.out)
+    dat <- cleanAndCheckData(design, version, best, worst, design.alternatives,
+                             design.version, alternative.names, subset,
+                             weights, characteristics, seed,
+                             n.questions.left.out)
 
     if (algorithm == "HB-Stan")
     {

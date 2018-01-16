@@ -4,15 +4,16 @@
 \alias{FitMaxDiff}
 \title{Rank-Ordered Logit Model for Max-Diff Experiments}
 \usage{
-FitMaxDiff(design, version = NULL, best, worst, alternative.names = NULL,
-  n.classes = 1, subset = NULL, weights = NULL, characteristics = NULL,
-  seed = 123, initial.parameters = NULL, trace = 0,
-  sub.model.outputs = FALSE, lc = TRUE, output = "Default",
-  tasks.left.out = 0, algorithm = "Default", normal.covariance = "Full",
-  lc.tolerance = 1e-04, is.tricked = TRUE, hb.iterations = 500,
-  hb.chains = 8, hb.max.tree.depth = 10, hb.adapt.delta = 0.8,
-  hb.keep.samples = FALSE, hb.stanfit = TRUE, hb.warnings = TRUE,
-  hb.max.draws = 100, ...)
+FitMaxDiff(design = NULL, version = NULL, best, worst,
+  design.alternatives = NULL, design.version = NULL,
+  alternative.names = NULL, n.classes = 1, subset = NULL,
+  weights = NULL, characteristics = NULL, seed = 123,
+  initial.parameters = NULL, trace = 0, sub.model.outputs = FALSE,
+  lc = TRUE, output = "Default", tasks.left.out = 0,
+  algorithm = "Default", normal.covariance = "Full", lc.tolerance = 1e-04,
+  is.tricked = TRUE, hb.iterations = 500, hb.chains = 8,
+  hb.max.tree.depth = 10, hb.adapt.delta = 0.8, hb.keep.samples = FALSE,
+  hb.stanfit = TRUE, hb.warnings = TRUE, hb.max.draws = 100, ...)
 }
 \arguments{
 \item{design}{A \code{data.frame}, where the first variable is
@@ -30,7 +31,13 @@ correspond to the \code{design} vector of integers showing the
 version of the design shown to each respondent. Coerced to a
 matrix if a \code{data.frame}.}
 
-\item{worst}{As with 'best', except denoting worst..}
+\item{worst}{As with 'best', except denoting worst.}
+
+\item{design.alternatives}{A data frame containing the alternatives in the
+design. This can be passed in instead of the \code{design} parameter.}
+
+\item{design.version}{A data frame containing the version numbers
+corresponding to \code{design.alternatives}.}
 
 \item{alternative.names}{A \code{character} vector of the
 alternative names. Where \code{best} and \code{worst} are
