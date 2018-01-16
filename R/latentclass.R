@@ -70,8 +70,8 @@ latentClassMaxDiff <- function(dat, ind.levels, resp.pars = NULL, n.classes = 1,
         class.sizes <- getClassWeights(p, n.classes, n.beta)
         # Reorder classes from largest to smallest
         mapping <- n.classes - rank(class.sizes) + 1
-        posterior.probabilities <- posterior.probabilities[, mapping]
-        class.sizes <- class.sizes[mapping]
+        posterior.probabilities[, mapping] <- posterior.probabilities
+        class.sizes[mapping] <- class.sizes
         coef <- createCoefMatrix(p, dat$alternative.names, n.classes, n.beta,
                                  mapping, class.sizes)
 
@@ -334,7 +334,7 @@ createCoefMatrix <- function(p, alternative.names, n.classes, n.beta, mapping,
     for (c in 1:n.classes)
         coef[2:(n.beta + 1), c] <- p[((c - 1) * n.beta + 1):(c * n.beta)]
     coef <- apply(coef, 2, function(x) x - mean(x))
-    coef <- coef[, mapping]
+    coef[, mapping] <- coef
     rownames(coef) <- alternative.names
     colnames(coef) <- paste0(paste("Class", 1:n.classes), " (",
                              FormatAsPercent(class.sizes, 3), ")")
